@@ -27,29 +27,30 @@ import {
   Activity,
   LogOut
 } from "lucide-react";
+import AdminLayout from "../components/AdminLayout";
 
 // ─── STYLING CONFIG ───────────────────────────────────────────────────────────
 const EASE_SPRING = [0.16, 1, 0.3, 1] as const;
 
 type ComplaintItem = {
   id: number;
-  kode_pengaduan?: string;
+  kodePengaduan?: string;
   judul: string;
   kategori: string;
   deskripsi: string;
   lokasi: string;
   prioritas: string;
   status: string;
-  foto_bukti?: string;
-  alasan_ditolak?: string;
-  tanggal_diproses?: string;
-  tanggal_selesai?: string;
-  created_at?: string;
-  pelapor_nik?: string;
-  pelapor_nama?: string;
-  petugas_id?: number;
-  petugas_nama?: string;
-  catatan_petugas?: string;
+  fotoBukti?: string;
+  alasanDitolak?: string;
+  tanggalDiproses?: string;
+  tanggalSelesai?: string;
+  createdAt?: string;
+  pelaporNik?: string;
+  pelaporNama?: string;
+  petugasId?: number;
+  petugasNama?: string;
+  catatanPetugas?: string;
 };
 
 type PetugasItem = {
@@ -80,15 +81,15 @@ const getPriorityBadgeClass = (p?: string) => {
   if (norm === "DARURAT") return "bg-red-100 text-red-700 border border-red-200";
   if (norm === "TINGGI") return "bg-amber-100 text-amber-700 border border-amber-200";
   if (norm === "RENDAH") return "bg-slate-100 text-slate-700 border border-slate-200";
-  return "bg-blue-100 text-blue-700 border border-blue-200"; // SEDANG
+  return "bg-red-100 text-red-700 border border-blue-200"; // SEDANG
 };
 
 const getStatusBadgeClass = (s?: string) => {
   const norm = (s || "").toUpperCase();
   if (norm === "SELESAI") return "bg-emerald-50 text-emerald-600 border border-emerald-100";
   if (norm === "DITOLAK") return "bg-rose-50 text-rose-600 border border-rose-100";
-  if (norm === "DIPROSES" || norm === "DIKERJAKAN") return "bg-blue-50 text-blue-600 border border-blue-100";
-  if (norm === "DITUGASKAN") return "bg-indigo-50 text-indigo-600 border border-indigo-100";
+  if (norm === "DIPROSES" || norm === "DIKERJAKAN") return "bg-red-50 text-red-600 border border-red-100";
+  if (norm === "DITUGASKAN") return "bg-rose-50 text-rose-600 border border-rose-100";
   return "bg-amber-50 text-amber-600 border border-amber-100"; // PENDING
 };
 
@@ -103,7 +104,7 @@ const getStatusLabel = (s?: string) => {
 
 const getTindakanLapanganDotClass = (status?: string) => {
   const norm = (status || "").toUpperCase();
-  return norm === "DIPROSES" || norm === "SELESAI" ? "bg-blue-500 animate-pulse" : "bg-slate-300";
+  return norm === "DIPROSES" || norm === "SELESAI" ? "bg-red-500 animate-pulse" : "bg-slate-300";
 };
 
 const getTindakanLapanganText = (status?: string) => {
@@ -127,64 +128,14 @@ const getFinalStepTitle = (status?: string) => {
 
 const getFinalStepDate = (complaint: ComplaintItem) => {
   const norm = (complaint.status || "").toUpperCase();
-  if (norm === "SELESAI") return safeFormatTanggal(complaint.tanggal_selesai);
+  if (norm === "SELESAI") return safeFormatTanggal(complaint.tanggalSelesai);
   if (norm === "DITOLAK") return "Administrasi gagal";
   return "-";
 };
 
-const AdminSidebar = ({ navigate, activePath }: { navigate: (path: string) => void; activePath: string }) => (
-  <aside className="hidden lg:flex w-72 bg-white border-r border-slate-200 flex-col sticky top-0 h-screen z-50 shadow-sm shrink-0">
-    <button type="button" className="p-8 flex items-center gap-3 cursor-pointer text-left" onClick={() => navigate('/admin')}>
-      <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-        <Building2 className="w-5 h-5 text-white" />
-      </div>
-      <div className="flex flex-col">
-        <span className="font-black text-slate-900 tracking-tighter text-base leading-none">ADMIN</span>
-        <span className="text-[9px] font-black text-blue-600 tracking-[0.3em] mt-1 uppercase">DigiDesa</span>
-      </div>
-    </button>
-
-    <nav className="flex-1 px-6 space-y-1.5 mt-4">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-4">Navigasi Utama</p>
-      {[
-        { n: "Overview", i: LayoutDashboard, p: "/admin" },
-        { n: "Validasi Surat", i: Files, p: "/admin/validasi" },
-        { n: "Moderasi Lapor", i: AlertTriangle, p: "/admin/laporan", active: true },
-        { n: "Data Penduduk", i: Users, p: "/admin/penduduk" },
-        { n: "Keuangan Desa", i: BarChart3, p: "/admin/keuangan" },
-        { n: "Pengaturan", i: Settings, p: "/admin/pengaturan" },
-      ].map((item) => (
-        <button
-          key={item.n}
-          onClick={() => item.p !== "#" && navigate(item.p)}
-          className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[13px] font-bold transition-all ${
-            item.active ? "bg-blue-50 text-blue-700 shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-          }`}
-        >
-          <item.i size={18} strokeWidth={item.active ? 3 : 2.5} />
-          {item.n}
-        </button>
-      ))}
-    </nav>
-
-    <div className="p-6 border-t border-slate-100">
-      <button 
-        onClick={() => {
-          localStorage.clear();
-          navigate('/login');
-        }}
-        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[13px] font-bold text-red-500 hover:bg-red-50 transition-all"
-      >
-        <LogOut size={18} strokeWidth={2.5} />
-        Keluar Sistem
-      </button>
-    </div>
-  </aside>
-);
-
 const AdminMetricCard = ({ title, value, helper, tone, icon }: { title: string; value: number; helper: string; tone: "blue" | "amber" | "emerald" | "red"; icon: React.ReactNode }) => {
   const toneClasses = {
-    blue: "bg-blue-50/50 border-blue-100 text-blue-600",
+    blue: "bg-red-50/50 border-red-100 text-red-600",
     amber: "bg-amber-50/50 border-amber-100 text-amber-600",
     emerald: "bg-emerald-50/50 border-emerald-100 text-emerald-600",
     red: "bg-red-50/50 border-red-100 text-red-600"
@@ -439,17 +390,17 @@ export default function AdminLaporan() {
                   <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${getPriorityBadgeClass(item.prioritas)}`}>
                     {item.prioritas}
                   </span>
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{item.kode_pengaduan || `PGD-${item.id}`}</span>
+                  <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">{item.kodePengaduan || `PGD-${item.id}`}</span>
                 </div>
 
-                <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
+                <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-red-600 transition-colors">
                   {item.judul}
                 </h3>
 
                 <div className="mt-5 space-y-2.5">
                   <div className="flex items-center gap-2.5 text-slate-500 text-xs font-semibold">
                     <User size={13} className="shrink-0 text-slate-400" />
-                    <span className="truncate">{item.pelapor_nama || "Warga Anonim"}</span>
+                    <span className="truncate">{item.pelaporNama || "Warga Anonim"}</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-slate-500 text-xs font-semibold">
                     <MapPin size={13} className="shrink-0 text-slate-400" />
@@ -457,7 +408,7 @@ export default function AdminLaporan() {
                   </div>
                   <div className="flex items-center gap-2.5 text-slate-500 text-xs font-semibold">
                     <Calendar size={13} className="shrink-0 text-slate-400" />
-                    <span>{safeFormatTanggal(item.created_at)}</span>
+                    <span>{safeFormatTanggal(item.createdAt)}</span>
                   </div>
                 </div>
               </div>
@@ -474,7 +425,7 @@ export default function AdminLaporan() {
                     setShowRejectForm(false);
                     setRejectReason("");
                   }}
-                  className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-slate-100"
+                  className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm border border-slate-100"
                 >
                   <ChevronRight size={16} strokeWidth={3} />
                 </button>
@@ -487,30 +438,9 @@ export default function AdminLaporan() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFEFF] font-sans antialiased flex overflow-hidden">
-      <AdminSidebar navigate={navigate} activePath="/admin/laporan" />
-
-      <main className="flex-1 overflow-y-auto relative h-screen">
-        
-        {/* HEADER */}
-        <header className="h-20 bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40 px-6 lg:px-10 flex items-center justify-between">
-          <div className="flex items-center gap-4 min-w-0">
-            <button onClick={() => navigate('/admin')} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">
-              <ArrowLeft size={20} />
-            </button>
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-slate-950 tracking-tight truncate">Moderasi Laporan Warga</h1>
-              <p className="text-sm text-slate-500 mt-1 truncate">Verifikasi aduan, tugaskan petugas RT/RW, dan monitor tindak lanjut di lapangan.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 px-4 py-2 bg-blue-50 rounded-2xl border border-blue-100 shrink-0">
-            <Clipboard size={14} className="text-blue-600" />
-            <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Otoritas RT/RW Aktif</p>
-          </div>
-        </header>
-
+    <AdminLayout activeMenu="Moderasi Lapor" title="Moderasi Laporan Warga" subtitle="Verifikasi aduan, tugaskan petugas RT/RW, dan monitor tindak lanjut di lapangan">
         {/* CONTENT AREA */}
-        <div className="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto w-full">
+        <div className="space-y-8 max-w-7xl mx-auto w-full">
           
           {/* STATS BENTO ROW */}
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -529,7 +459,7 @@ export default function AdminLaporan() {
                   onClick={() => setActiveTab(t as any)}
                   className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
                     activeTab === t
-                      ? "bg-white text-blue-700 shadow-sm border border-slate-100"
+                      ? "bg-white text-red-700 shadow-sm border border-slate-100"
                       : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
@@ -545,7 +475,7 @@ export default function AdminLaporan() {
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="bg-white border border-slate-200 text-xs font-black uppercase tracking-wider rounded-xl py-2 px-3 text-slate-700 outline-none focus:border-blue-500"
+                className="bg-white border border-slate-200 text-xs font-black uppercase tracking-wider rounded-xl py-2 px-3 text-slate-700 outline-none focus:border-red-500"
               >
                 <option value="ALL">Semua Tingkat</option>
                 <option value="RENDAH">Rendah</option>
@@ -574,7 +504,7 @@ export default function AdminLaporan() {
                 {/* Modal Header */}
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600">Pusat Moderasi & Tindakan DigiDesa</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-red-600">Pusat Moderasi & Tindakan DigiDesa</span>
                     <h3 className="text-base font-black text-slate-900 mt-1">Kelola Pengaduan & Penugasan Petugas</h3>
                   </div>
                   <button
@@ -595,16 +525,16 @@ export default function AdminLaporan() {
                           Urgensi: {selectedComplaint.prioritas}
                         </span>
                         <h4 className="text-lg font-black text-slate-900 mt-3 leading-tight">{selectedComplaint.judul}</h4>
-                        <p className="text-blue-600 font-bold mt-1 text-[10px]">No Ref: {selectedComplaint.kode_pengaduan || `PGD-${selectedComplaint.id}`}</p>
+                        <p className="text-red-600 font-bold mt-1 text-[10px]">No Ref: {selectedComplaint.kodePengaduan || `PGD-${selectedComplaint.id}`}</p>
                       </div>
 
                       <div className="grid grid-cols-[110px_1fr] gap-y-2 border-t border-slate-100 pt-4">
                         <span className="text-slate-400">Nama Pelapor</span>
-                        <span className="font-bold text-slate-900">: {selectedComplaint.pelapor_nama || "Anonim"} (NIK: {selectedComplaint.pelapor_nik || "-"})</span>
+                        <span className="font-bold text-slate-900">: {selectedComplaint.pelaporNama || "Anonim"} (NIK: {selectedComplaint.pelaporNik || "-"})</span>
                         <span className="text-slate-400">Lokasi Kejadian</span>
                         <span className="font-bold text-slate-900">: {selectedComplaint.lokasi || "-"}</span>
                         <span className="text-slate-400">Tanggal Aduan</span>
-                        <span className="font-bold text-slate-900">: {safeFormatTanggalLengkap(selectedComplaint.created_at)}</span>
+                        <span className="font-bold text-slate-900">: {safeFormatTanggalLengkap(selectedComplaint.createdAt)}</span>
                         <span className="text-slate-400">Kategori Aduan</span>
                         <span className="font-bold text-slate-900">: {selectedComplaint.kategori}</span>
                       </div>
@@ -615,11 +545,11 @@ export default function AdminLaporan() {
                       </div>
 
                       {/* Photo Lampiran */}
-                      {selectedComplaint.foto_bukti && (
+                      {selectedComplaint.fotoBukti && (
                         <div className="mt-4">
                           <span className="font-black block text-[9px] uppercase tracking-widest text-slate-400 mb-2">Lampiran Bukti Foto Warga:</span>
-                          <a href={selectedComplaint.foto_bukti} target="_blank" rel="noreferrer" className="block max-w-sm rounded-xl overflow-hidden border border-slate-200 group">
-                            <img src={selectedComplaint.foto_bukti} className="w-full h-32 object-cover group-hover:scale-105 transition-all" alt="Foto aduan" />
+                          <a href={selectedComplaint.fotoBukti} target="_blank" rel="noreferrer" className="block max-w-sm rounded-xl overflow-hidden border border-slate-200 group">
+                            <img src={selectedComplaint.fotoBukti} className="w-full h-32 object-cover group-hover:scale-105 transition-all" alt="Foto aduan" />
                           </a>
                         </div>
                       )}
@@ -628,7 +558,7 @@ export default function AdminLaporan() {
                     <div className="pt-5 border-t border-slate-100 flex items-center justify-between mt-6">
                       <div>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Petugas Pelaksana</p>
-                        <p className="font-bold text-[11px] text-slate-950 mt-1.5">{selectedComplaint.petugas_nama || "Belum Ditugaskan"}</p>
+                        <p className="font-bold text-[11px] text-slate-950 mt-1.5">{selectedComplaint.petugasNama || "Belum Ditugaskan"}</p>
                       </div>
                       <span className={`inline-flex px-2.5 py-1 rounded-lg text-[9px] font-black uppercase ${getStatusBadgeClass(selectedComplaint.status)}`}>
                         {getStatusLabel(selectedComplaint.status)}
@@ -642,21 +572,21 @@ export default function AdminLaporan() {
                     {/* Status Tracking Timeline */}
                     <div className="bg-white p-5 border border-slate-200/60 rounded-2xl shadow-sm text-xs font-semibold">
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-950 mb-4 flex items-center gap-2">
-                        <Activity size={14} className="text-blue-600" /> Progres Pelacakan
+                        <Activity size={14} className="text-red-600" /> Progres Pelacakan
                       </h4>
 
                       <div className="space-y-3 relative pl-3 border-l border-slate-200 ml-2">
                         <div className="relative">
                           <div className="absolute -left-[20px] top-0 w-3 h-3 rounded-full border-2 border-white bg-emerald-500 shadow-sm" />
                           <p className="text-[10px] font-black uppercase tracking-wider text-slate-900 leading-none">1. Laporan Diajukan</p>
-                          <p className="text-[9px] text-slate-400 mt-1">{safeFormatTanggal(selectedComplaint.created_at)}</p>
+                          <p className="text-[9px] text-slate-400 mt-1">{safeFormatTanggal(selectedComplaint.createdAt)}</p>
                         </div>
                         <div className="relative">
                           <div className={`absolute -left-[20px] top-0 w-3 h-3 rounded-full border-2 border-white ${
-                            selectedComplaint.petugas_id ? "bg-emerald-500" : "bg-slate-300"
+                            selectedComplaint.petugasId ? "bg-emerald-500" : "bg-slate-300"
                           }`} />
                           <p className="text-[10px] font-black uppercase tracking-wider text-slate-900 leading-none">2. Validasi & Ditugaskan</p>
-                          <p className="text-[9px] text-slate-400 mt-1">{selectedComplaint.petugas_nama ? `Petugas: ${selectedComplaint.petugas_nama}` : "Belum divalidasi"}</p>
+                          <p className="text-[9px] text-slate-400 mt-1">{selectedComplaint.petugasNama ? `Petugas: ${selectedComplaint.petugasNama}` : "Belum divalidasi"}</p>
                         </div>
                         <div className="relative">
                           <div className={`absolute -left-[20px] top-0 w-3 h-3 rounded-full border-2 border-white ${
@@ -725,7 +655,7 @@ export default function AdminLaporan() {
                                   required
                                   value={selectedPetugasId}
                                   onChange={(e) => setSelectedPetugasId(e.target.value)}
-                                  className="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl py-3 px-3.5 text-slate-900 outline-none focus:border-blue-500 focus:bg-white"
+                                  className="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl py-3 px-3.5 text-slate-900 outline-none focus:border-red-500 focus:bg-white"
                                 >
                                   <option value="">-- Pilih Akun Petugas --</option>
                                   {petugasList.map(p => (
@@ -740,7 +670,7 @@ export default function AdminLaporan() {
                                   id="assign-note"
                                   rows={2}
                                   placeholder="Contoh: Perbaiki kebocoran pipa utama segera..."
-                                  className="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl py-3 px-3.5 text-slate-900 resize-none outline-none focus:border-blue-500 focus:bg-white"
+                                  className="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl py-3 px-3.5 text-slate-900 resize-none outline-none focus:border-red-500 focus:bg-white"
                                   value={assignNote}
                                   onChange={(e) => setAssignNote(e.target.value)}
                                 />
@@ -749,7 +679,7 @@ export default function AdminLaporan() {
                               <button
                                 type="submit"
                                 disabled={isProcessingAction}
-                                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/10"
+                                className="w-full py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md shadow-red-500/10"
                               >
                                 <UserCheck size={14} /> Setujui & Tugaskan
                               </button>
@@ -775,7 +705,7 @@ export default function AdminLaporan() {
                             <button
                               onClick={() => handleUpdateStatus("DIPROSES")}
                               disabled={isProcessingAction}
-                              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/10"
+                              className="w-full py-3.5 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md shadow-red-500/10"
                             >
                               <Activity size={14} className="animate-pulse" /> Mulai Pengerjaan Lapangan
                             </button>
@@ -815,7 +745,7 @@ export default function AdminLaporan() {
 
                     <button
                       onClick={() => setSelectedComplaint(null)}
-                      className="w-full py-3 bg-slate-950 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all"
+                      className="w-full py-3 bg-slate-950 hover:bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all"
                     >
                       Kembali ke List Aduan
                     </button>
@@ -826,7 +756,6 @@ export default function AdminLaporan() {
           )}
         </AnimatePresence>
 
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

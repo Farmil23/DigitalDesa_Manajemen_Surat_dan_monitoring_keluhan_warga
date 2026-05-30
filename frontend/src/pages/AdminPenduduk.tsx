@@ -24,6 +24,7 @@ import {
   FileText,
   SlidersHorizontal,
 } from "lucide-react";
+import AdminLayout from "../components/AdminLayout";
 
 export default function AdminPenduduk() {
   const navigate = useNavigate();
@@ -268,101 +269,33 @@ export default function AdminPenduduk() {
 
   const keluargaList = Object.values(groupedKeluarga);
 
-  const menuItems = [
-    { n: "Overview", i: LayoutDashboard, p: "/admin" },
-    { n: "Validasi Surat", i: Files, p: "/admin/validasi" },
-    { n: "Moderasi Lapor", i: AlertTriangle, p: "/admin/laporan" },
-    { n: "Data Penduduk", i: Users, p: "/admin/penduduk", active: true },
-    { n: "Keuangan Desa", i: BarChart3, p: "/admin/keuangan" },
-    { n: "Pengaturan", i: Settings, p: "/admin/pengaturan" },
-  ];
-
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased flex">
-      <aside className="hidden lg:flex w-72 bg-white border-r border-slate-200 flex-col sticky top-0 h-screen z-40">
-        <div
-          className="px-7 py-7 flex items-center gap-3 cursor-pointer border-b border-slate-100"
-          onClick={() => navigate("/admin")}
-        >
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-
-          <div>
-            <p className="font-bold text-slate-900 tracking-tight leading-none">DigiDesa</p>
-            <p className="text-xs text-slate-500 mt-1">Panel Admin Desa</p>
-          </div>
-        </div>
-
-        <nav className="flex-1 px-5 py-6 space-y-1.5">
-          <p className="px-3 mb-3 text-xs font-semibold text-slate-400">Navigasi</p>
-
-          {menuItems.map((item) => {
-            const Icon = item.i;
-
-            return (
-              <button
-                key={item.n}
-                onClick={() => navigate(item.p)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                  item.active
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <Icon size={18} strokeWidth={item.active ? 2.6 : 2.2} />
-                {item.n}
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-
-      <main className="flex-1 flex flex-col min-h-screen relative">
-        <header className="h-20 bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-30 px-6 lg:px-10 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/admin")}
-              className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-
-            <div>
-              <h1 className="text-xl font-bold text-slate-950 tracking-tight">
-                Sistem Kependudukan
-              </h1>
-              <p className="text-sm text-slate-500 mt-1">
-                Kelola data warga, kartu keluarga, domisili, dan verifikasi akun.
-              </p>
-            </div>
-          </div>
-
+    <AdminLayout activeMenu="Data Penduduk" title="Sistem Kependudukan" subtitle="Kelola data warga, kartu keluarga, domisili, dan verifikasi akun">
+      <div className="space-y-8 max-w-7xl mx-auto w-full">
+        <div className="flex justify-end">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all shadow-sm"
           >
             <UserPlus size={17} strokeWidth={2.5} />
             Tambah warga
           </button>
-        </header>
-
-        <div className="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto w-full">
+        </div>
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             <button
               type="button"
               onClick={() => setTypeFilter("ALL")}
               className={`text-left p-6 rounded-2xl border transition-all ${
                 typeFilter === "ALL"
-                  ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                  ? "bg-red-600 text-white border-red-600 shadow-sm"
                   : "bg-white border-slate-200 hover:border-blue-200"
               }`}
             >
-              <p className={`text-sm font-semibold ${typeFilter === "ALL" ? "text-blue-100" : "text-slate-500"}`}>
+              <p className={`text-sm font-semibold ${typeFilter === "ALL" ? "text-red-100" : "text-slate-500"}`}>
                 Total penduduk
               </p>
               <h3 className="text-3xl font-bold mt-2 tracking-tight">{totalJiwa} Warga</h3>
-              <p className={`text-xs font-medium mt-4 ${typeFilter === "ALL" ? "text-blue-100" : "text-blue-600"}`}>
+              <p className={`text-xs font-medium mt-4 ${typeFilter === "ALL" ? "text-red-100" : "text-red-600"}`}>
                 {typeFilter === "ALL" ? "Semua data ditampilkan" : "Klik untuk reset filter"}
               </p>
             </button>
@@ -388,7 +321,7 @@ export default function AdminPenduduk() {
               onClick={() => setTypeFilter("PENDATANG")}
               className={`text-left p-6 rounded-2xl border transition-all ${
                 typeFilter === "PENDATANG"
-                  ? "bg-indigo-50 border-indigo-200 shadow-sm"
+                  ? "bg-rose-50 border-indigo-200 shadow-sm"
                   : "bg-white border-slate-200 hover:border-indigo-200"
               }`}
             >
@@ -435,7 +368,7 @@ export default function AdminPenduduk() {
                 placeholder="Cari nama atau NIK..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium outline-none focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm font-medium outline-none focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 transition-all"
               />
             </div>
 
@@ -515,7 +448,7 @@ export default function AdminPenduduk() {
                       {isLoading ? (
                         <tr>
                           <td colSpan={4} className="py-16 text-center">
-                            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
+                            <Loader2 className="w-8 h-8 animate-spin text-red-600 mx-auto" />
                           </td>
                         </tr>
                       ) : filteredPenduduk.length > 0 ? (
@@ -557,7 +490,7 @@ export default function AdminPenduduk() {
                                   <span
                                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
                                       warga.status_tinggal === "PENDATANG"
-                                        ? "bg-indigo-50 text-indigo-700"
+                                        ? "bg-rose-50 text-indigo-700"
                                         : "bg-emerald-50 text-emerald-700"
                                     }`}
                                   >
@@ -653,7 +586,7 @@ export default function AdminPenduduk() {
                           <tr key={i} className="hover:bg-slate-50/70 transition-colors">
                             <td className="px-6 py-5">
                               <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                                <div className="w-9 h-9 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
                                   <FileText size={16} />
                                 </div>
 
@@ -750,7 +683,7 @@ export default function AdminPenduduk() {
 
                     <div className="flex justify-between gap-5 py-3 border-b border-slate-100">
                       <span className="font-medium text-slate-500">No kartu keluarga</span>
-                      <span className="font-semibold text-blue-600 text-right">
+                      <span className="font-semibold text-red-600 text-right">
                         {selectedPenduduk.no_kk || "Belum diisi"}
                       </span>
                     </div>
@@ -862,7 +795,7 @@ export default function AdminPenduduk() {
                         type="text"
                         value={formData.nik}
                         onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                         placeholder="16 digit NIK"
                       />
                     </div>
@@ -874,7 +807,7 @@ export default function AdminPenduduk() {
                         type="text"
                         value={formData.no_kk}
                         onChange={(e) => setFormData({ ...formData, no_kk: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                         placeholder="16 digit KK"
                       />
                     </div>
@@ -887,7 +820,7 @@ export default function AdminPenduduk() {
                       type="text"
                       value={formData.nama_lengkap}
                       onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                       placeholder="Sesuai KTP"
                     />
                   </div>
@@ -900,7 +833,7 @@ export default function AdminPenduduk() {
                       <select
                         value={formData.status_hubungan}
                         onChange={(e) => setFormData({ ...formData, status_hubungan: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium outline-none cursor-pointer focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium outline-none cursor-pointer focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 transition-all"
                       >
                         <option value="Kepala Keluarga">Kepala Keluarga</option>
                         <option value="Istri">Istri</option>
@@ -916,7 +849,7 @@ export default function AdminPenduduk() {
                       <select
                         value={formData.status_tinggal}
                         onChange={(e) => setFormData({ ...formData, status_tinggal: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium outline-none cursor-pointer focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium outline-none cursor-pointer focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 transition-all"
                       >
                         <option value="TETAP">Warga Tetap</option>
                         <option value="PENDATANG">Warga Pendatang</option>
@@ -931,7 +864,7 @@ export default function AdminPenduduk() {
                       type="text"
                       value={formData.alamat}
                       onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                       placeholder="Nama jalan atau blok"
                     />
                   </div>
@@ -944,7 +877,7 @@ export default function AdminPenduduk() {
                         type="text"
                         value={formData.rt}
                         onChange={(e) => setFormData({ ...formData, rt: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                         placeholder="001"
                       />
                     </div>
@@ -956,7 +889,7 @@ export default function AdminPenduduk() {
                         type="text"
                         value={formData.rw}
                         onChange={(e) => setFormData({ ...formData, rw: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                         placeholder="010"
                       />
                     </div>
@@ -968,7 +901,7 @@ export default function AdminPenduduk() {
                         type="text"
                         value={formData.no_hp}
                         onChange={(e) => setFormData({ ...formData, no_hp: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                         placeholder="08xxx"
                       />
                     </div>
@@ -983,7 +916,7 @@ export default function AdminPenduduk() {
                         type="text"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                         placeholder="Kosongkan jika default pakai NIK"
                       />
                     </div>
@@ -995,7 +928,7 @@ export default function AdminPenduduk() {
                     className={`w-full py-3.5 mt-4 text-white rounded-xl font-semibold shadow-sm transition-all ${
                       isEditModalOpen
                         ? "bg-amber-500 hover:bg-amber-600"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "bg-red-600 hover:bg-red-700"
                     }`}
                   >
                     {isSubmitting ? (
@@ -1011,7 +944,6 @@ export default function AdminPenduduk() {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

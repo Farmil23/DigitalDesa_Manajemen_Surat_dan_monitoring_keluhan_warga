@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, cubicBezier, type Variants } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { motion, cubicBezier } from "framer-motion";
+import { useNavigate, useLocation } from "react-router-dom";
+import PanduanWarga from "../components/PanduanWarga";
 import {
   ArrowRight,
   Shield,
@@ -13,913 +14,491 @@ import {
   ChevronRight,
   BarChart3,
   Layers,
-  Lock,
   TrendingUp,
   Activity,
-  Sparkles,
   Globe,
   Database,
+  UserCircle,
+  LogOut,
+  LayoutDashboard,
+  Mail,
+  MapPin,
+  Phone,
+  MailOpen,
+  AlertTriangle
 } from "lucide-react";
-
-// ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
 const EASE_SPRING = cubicBezier(0.16, 1, 0.3, 1);
 
-const STAGGER_CONTAINER: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
+const FADE_UP = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE_SPRING } }
 };
 
-const FADE_UP: Variants = {
-  hidden: { opacity: 0, y: 48, filter: "blur(4px)" },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.8, ease: EASE_SPRING },
-  },
-};
-
-// ─── NOISE TEXTURE ────────────────────────────────────────────────────────────
-
-function NoiseTexture() {
-  return (
-    <svg className="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none" aria-hidden="true">
-      <filter id="noise">
-        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-        <feColorMatrix type="saturate" values="0" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#noise)" />
-    </svg>
-  );
+function scrollToSection(id: string) {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
-
-// ─── NAVBAR ───────────────────────────────────────────────────────────────────
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener("scroll", onScroll, { passive: true });
+
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try { setUserData(JSON.parse(userStr)); } catch(e){}
+    }
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setUserData(null);
+    navigate("/");
+  };
+
+  const navItems = [
+    { name: "Beranda", id: "hero" },
+    { name: "Layanan", id: "layanan" },
+    { name: "Panduan", id: "panduan" },
+    { name: "Statistik", id: "statistik" },
+  ];
 
   return (
     <motion.nav
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: EASE_SPRING }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-[#080B14]/90 backdrop-blur-2xl border-b border-white/[0.06]"
+          ? "bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm"
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-8 h-[68px] flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-[#4F6EF7] to-[#7C3AED] flex items-center justify-center shadow-[0_0_20px_rgba(79,110,247,0.4)]">
-            <Layers className="w-[18px] h-[18px] text-white" />
+      <div className="max-w-7xl mx-auto px-6 md:px-8 h-[72px] flex items-center justify-between">
+        <button onClick={() => window.scrollTo({top:0, behavior:'smooth'})} className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform">
+            <Layers className="w-5 h-5 text-white" />
           </div>
-          <span className="font-bold text-white tracking-[-0.02em] text-[1.05rem]">
-            Digi<span className="text-[#4F6EF7]">Desa</span>
+          <span className="font-bold text-slate-900 tracking-[-0.02em] text-xl">
+            Digi<span className="text-red-600">Desa</span>
           </span>
-        </div>
+        </button>
 
-        <div className="hidden md:flex items-center gap-1">
-          {["Layanan", "Statistik", "Pengumuman", "Bantuan"].map((item) => (
+        <div className="hidden md:flex items-center gap-1 bg-slate-50/50 rounded-2xl p-1 border border-slate-100">
+          {navItems.map((item) => (
             <button
-              key={item}
-              type="button"
-              className="text-[13px] font-medium text-white/50 hover:text-white/90 px-4 py-2 rounded-lg hover:bg-white/[0.06] transition-all duration-200"
+              key={item.name}
+              onClick={() => scrollToSection(item.id)}
+              className="text-[13px] font-bold text-slate-500 hover:text-slate-900 hover:bg-white px-5 py-2.5 rounded-xl transition-all duration-200 shadow-none hover:shadow-sm"
             >
-              {item}
+              {item.name}
             </button>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="hidden sm:block text-[13px] font-medium text-white/50 hover:text-white/90 px-4 py-2 rounded-lg hover:bg-white/[0.06] transition-all">
-            Masuk
-          </button>
-          <motion.button
-            onClick={() => navigate("/login")}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="text-[13px] font-semibold text-white bg-[#4F6EF7] hover:bg-[#3D5CE8] px-5 py-2.5 rounded-xl transition-all shadow-[0_4px_16px_rgba(79,110,247,0.35)]"
-          >
-            Portal RW/RT
-          </motion.button>
+          {userData ? (
+            <div className="relative">
+              <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="flex items-center gap-3 bg-white/50 hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full transition-all shadow-sm">
+                <img className="w-8 h-8 rounded-full bg-slate-100 object-cover" src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userData?.nama_lengkap || 'Warga'}`} alt="Avatar" />
+                <span className="text-sm font-bold text-slate-700 hidden sm:block pr-2">{userData.nama_lengkap?.split(' ')[0] || "Warga"}</span>
+              </button>
+              
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden py-2 z-50">
+                  <div className="px-4 py-3 border-b border-slate-50 mb-1">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Akun Saya</p>
+                    <p className="text-sm font-bold text-slate-900 mt-1 truncate">{userData?.nama_lengkap || "Warga"}</p>
+                  </div>
+                  <button onClick={() => navigate(localStorage.getItem('role') === 'ADMIN' ? '/admin/dashboard' : '/dashboard-warga')} className="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-3 transition-colors">
+                    <LayoutDashboard size={16} /> Buka Dashboard
+                  </button>
+                  <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors border-t border-slate-50 mt-1">
+                    <LogOut size={16} /> Keluar Sistem
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button onClick={() => navigate("/login")} className="hidden sm:block text-[14px] font-bold text-slate-500 hover:text-slate-900 px-4 py-2 rounded-xl hover:bg-slate-50 transition-all">
+                Masuk
+              </button>
+              <motion.button
+                onClick={() => navigate("/login")}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="text-[14px] font-bold text-white bg-red-600 hover:bg-red-700 px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-red-600/20"
+              >
+                Mulai Sekarang
+              </motion.button>
+            </>
+          )}
         </div>
       </div>
     </motion.nav>
   );
 }
 
-// ─── GRID BACKGROUND ─────────────────────────────────────────────────────────
-
-function GridBg() {
-  return (
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-          linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px)
-        `,
-        backgroundSize: "72px 72px",
-        maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%)",
-      }}
-    />
-  );
-}
-
-// ─── AURORA ───────────────────────────────────────────────────────────────────
-
-function Aurora() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div
-        animate={{ scale: [1, 1.08, 1], opacity: [0.18, 0.24, 0.18] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-[20%] left-[10%] w-[700px] h-[700px] rounded-full"
-        style={{ background: "radial-gradient(circle, #4F6EF7 0%, transparent 70%)", filter: "blur(80px)" }}
-      />
-      <motion.div
-        animate={{ scale: [1, 1.12, 1], opacity: [0.12, 0.18, 0.12] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-        className="absolute -top-[10%] right-[5%] w-[500px] h-[500px] rounded-full"
-        style={{ background: "radial-gradient(circle, #7C3AED 0%, transparent 70%)", filter: "blur(90px)" }}
-      />
-      <motion.div
-        animate={{ scale: [1, 1.06, 1], opacity: [0.1, 0.15, 0.1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 8 }}
-        className="absolute top-[30%] left-[60%] w-[400px] h-[400px] rounded-full"
-        style={{ background: "radial-gradient(circle, #06B6D4 0%, transparent 70%)", filter: "blur(100px)" }}
-      />
-    </div>
-  );
-}
-
-// ─── FLOATING UI CARDS ────────────────────────────────────────────────────────
-
-function ProgressBar({ value, delay = 0 }: Readonly<{ value: number; delay?: number }>) {
-  return (
-    <div className="h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
-      <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: `${value}%` }}
-        transition={{ duration: 1.6, delay: 1 + delay, ease: EASE_SPRING }}
-        className="h-full bg-gradient-to-r from-[#4F6EF7] to-[#7C3AED] rounded-full"
-      />
-    </div>
-  );
-}
-
-function CardMainApplication() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 48, x: -8 }}
-      animate={{ opacity: 1, y: 0, x: 0 }}
-      transition={{ duration: 1, delay: 0.5, ease: EASE_SPRING }}
-      className="relative w-[340px] bg-[#0E1320]/90 backdrop-blur-2xl rounded-[20px] border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.6)] p-5 z-20"
-      style={{ boxShadow: "0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)" }}
-    >
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="text-[10px] font-bold text-amber-400/90 uppercase tracking-widest">Diproses</span>
-          </div>
-          <h4 className="text-[13px] font-bold text-white/90 leading-snug">Surat Keterangan Domisili</h4>
-          <p className="text-[11px] text-white/30 mt-0.5 font-mono">SKD-2026-00841</p>
-        </div>
-        <div className="w-10 h-10 rounded-xl bg-[#4F6EF7]/15 border border-[#4F6EF7]/20 flex items-center justify-center">
-          <FileText className="w-5 h-5 text-[#4F6EF7]" />
-        </div>
-      </div>
-
-      <div className="h-px bg-white/[0.05] mb-5" />
-
-      <div className="space-y-3 mb-5">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.04]">
-          <div className="w-8 h-8 rounded-xl bg-[#4F6EF7]/10 flex items-center justify-center flex-shrink-0">
-            <Users className="w-4 h-4 text-[#4F6EF7]" />
-          </div>
-          <div>
-            <p className="text-[10px] font-medium text-white/30">Pemohon · RT 01/RW 10</p>
-            <p className="text-[12px] font-bold text-white/80">Budi Santoso</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.04]">
-          <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center flex-shrink-0">
-            <Clock className="w-4 h-4 text-violet-400" />
-          </div>
-          <div>
-            <p className="text-[10px] font-medium text-white/30">Estimasi Selesai</p>
-            <p className="text-[12px] font-bold text-white/80">Hari ini 14:00 WIB</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-[11px] font-semibold text-white/40">Progress Verifikasi</p>
-          <p className="text-[11px] font-bold text-[#4F6EF7]">65%</p>
-        </div>
-        <ProgressBar value={65} />
-      </div>
-
-      <div className="flex items-center gap-1.5">
-        {["Terima", "Verifikasi", "TTD", "Selesai"].map((step, i) => {
-          const isDone = i < 2;
-          const isCurrent = i === 2;
-
-          let circleClass = "bg-white/[0.06] border border-white/10";
-          if (isDone) {
-            circleClass = "bg-[#4F6EF7] shadow-[0_0_8px_rgba(79,110,247,0.5)]";
-          } else if (isCurrent) {
-            circleClass = "bg-amber-400/30 border border-amber-400/50";
-          }
-
-          return (
-            <div key={step} className="flex items-center flex-1 min-w-0">
-              <div className="flex flex-col items-center gap-1.5 w-full">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${circleClass}`}
-                >
-                  {isDone ? (
-                    <CheckCircle2 className="w-3 h-3 text-white" />
-                  ) : (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
-                  )}
-                </div>
-                <p className="text-[9px] font-bold text-white/30 text-center">{step}</p>
-              </div>
-              {i < 3 && (
-                <div
-                  className={`h-px flex-1 mb-4 mx-1 ${i < 1 ? "bg-[#4F6EF7]/40" : "bg-white/[0.06]"}`}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </motion.div>
-  );
-}
-
-function CardStats() {
-  const stats = [
-    { label: "Warga Terdaftar", value: "4.821", delta: "+12", icon: Users },
-    { label: "Pengajuan Aktif", value: "138", delta: "23 pending", icon: FileText },
-    { label: "Completion Rate", value: "96.4%", delta: "↑ 2.1%", icon: TrendingUp },
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 32, x: -20, rotate: 0 }}
-      animate={{ opacity: 1, y: 0, x: 0, rotate: -3 }}
-      transition={{ duration: 1, delay: 0.3, ease: EASE_SPRING }}
-      className="absolute -left-10 top-4 w-[260px] bg-[#0C1019]/95 backdrop-blur-2xl rounded-[18px] border border-white/[0.07] p-5 z-10"
-      style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)" }}
-    >
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-6 h-6 rounded-lg bg-[#4F6EF7]/15 flex items-center justify-center">
-          <BarChart3 className="w-3.5 h-3.5 text-[#4F6EF7]" />
-        </div>
-        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Live Analytics</span>
-        <span className="ml-auto flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[9px] font-bold text-emerald-400">Live</span>
-        </span>
-      </div>
-      <div className="space-y-3">
-        {stats.map(({ label, value, delta, icon: Icon }) => (
-          <div key={label} className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                <Icon className="w-3.5 h-3.5 text-white/40" />
-              </div>
-              <div>
-                <p className="text-[10px] font-medium text-white/30 leading-none mb-1">{label}</p>
-                <p className="text-[13px] font-bold text-white/90 leading-none">{value}</p>
-              </div>
-            </div>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-1 rounded-lg">
-              {delta}
-            </span>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-function CardNotification() {
-  const items = [
-    {
-      icon: CheckCircle2,
-      color: "text-emerald-400",
-      bg: "bg-emerald-400/10",
-      border: "border-emerald-400/20",
-      text: "SK Usaha Dewi R. diterbitkan",
-      time: "2m lalu",
-    },
-    {
-      icon: Bell,
-      color: "text-[#4F6EF7]",
-      bg: "bg-[#4F6EF7]/10",
-      border: "border-[#4F6EF7]/20",
-      text: "3 pengajuan baru butuh verifikasi",
-      time: "11m lalu",
-    },
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 32, y: 16 }}
-      animate={{ opacity: 1, x: 0, y: 0 }}
-      transition={{ duration: 0.9, delay: 0.7, ease: EASE_SPRING }}
-      className="absolute -right-8 bottom-8 w-[240px] bg-[#0C1019]/95 backdrop-blur-2xl rounded-[16px] border border-white/[0.07] p-4 z-30"
-      style={{ boxShadow: "0 16px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)" }}
-    >
-      <div className="flex items-center gap-2 mb-3.5">
-        <Activity className="w-3.5 h-3.5 text-white/30" />
-        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Aktivitas</span>
-        <span className="ml-auto text-[9px] font-bold text-white bg-[#4F6EF7] px-1.5 py-0.5 rounded-md">2 baru</span>
-      </div>
-      <div className="space-y-2.5">
-        {items.map(({ icon: Icon, color, bg, border, text, time }) => (
-          <div key={text} className={`flex items-start gap-2.5 p-2.5 rounded-xl border ${border} ${bg}`}>
-            <Icon className={`w-3.5 h-3.5 ${color} flex-shrink-0 mt-0.5`} />
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-white/70 leading-tight">{text}</p>
-              <p className="text-[10px] font-semibold text-white/30 mt-0.5">{time}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-function SecurityBadge() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 1, duration: 0.5, ease: EASE_SPRING }}
-      className="absolute top-0 right-8 bg-[#0C1019]/95 backdrop-blur-xl border border-white/[0.07] rounded-xl px-3 py-2 z-40 flex items-center gap-2"
-      style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)" }}
-    >
-      <div className="w-4 h-4 rounded-full bg-emerald-400/20 border border-emerald-400/30 flex items-center justify-center">
-        <Lock className="w-2.5 h-2.5 text-emerald-400" />
-      </div>
-      <span className="text-[11px] font-bold text-white/70">Encrypted · TLS 1.3</span>
-    </motion.div>
-  );
-}
-
-function FloatingCards() {
-  return (
-    <div className="relative w-full h-full min-h-[580px] flex items-center justify-center">
-      <CardStats />
-      <div className="relative z-20 mt-8">
-        <CardMainApplication />
-      </div>
-      <CardNotification />
-      <SecurityBadge />
-    </div>
-  );
-}
-
-// ─── BADGE ────────────────────────────────────────────────────────────────────
-
-function AnnouncementBadge() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: EASE_SPRING }}
-      className="inline-flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.1] rounded-full px-4 py-2 mb-8 hover:bg-white/[0.06] transition-all cursor-pointer group"
-    >
-      <div className="flex items-center gap-1.5">
-        <Sparkles className="w-3.5 h-3.5 text-[#4F6EF7]" />
-        <span className="text-[11px] font-bold text-[#4F6EF7] uppercase tracking-widest">Baru</span>
-      </div>
-      <div className="w-px h-3.5 bg-white/[0.1]" />
-      <span className="text-[12px] font-medium text-white/60">
-        Integrasi sistem kependudukan v2.0 telah tersedia
-      </span>
-      <ChevronRight className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 group-hover:translate-x-0.5 transition-all" />
-    </motion.div>
-  );
-}
-
-// ─── TRUST STRIP ──────────────────────────────────────────────────────────────
-
-function TrustStrip() {
-  const items = [
-    { icon: Shield, label: "SOC 2 Compliant" },
-    { icon: Lock, label: "End-to-End Encrypted" },
-    { icon: Globe, label: "99.9% Uptime SLA" },
-    { icon: Database, label: "Data Sovereignty" },
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.1, duration: 0.8 }}
-      className="mt-16 pt-10 border-t border-white/[0.06]"
-    >
-      <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-6">
-        Infrastruktur Berstandar Enterprise
-      </p>
-      <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-        {items.map(({ icon: Icon, label }) => (
-          <div key={label} className="flex items-center gap-2 text-white/30 hover:text-white/50 transition-colors">
-            <Icon className="w-3.5 h-3.5" />
-            <span className="text-[12px] font-semibold">{label}</span>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── HERO ─────────────────────────────────────────────────────────────────────
-
 function Hero() {
-  return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-[68px] bg-[#080B14]">
-      <NoiseTexture />
-      <GridBg />
-      <Aurora />
-
-      <div className="max-w-7xl mx-auto px-8 w-full relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[56fr_44fr] gap-16 items-center min-h-[calc(100vh-68px)] py-24">
-          <motion.div
-            variants={STAGGER_CONTAINER}
-            initial="hidden"
-            animate="show"
-            className="max-w-2xl"
-          >
-            <motion.div variants={FADE_UP}>
-              <AnnouncementBadge />
-            </motion.div>
-
-            <motion.div variants={FADE_UP} className="mb-8">
-              <h1
-                className="text-[3.6rem] sm:text-[4.5rem] lg:text-[5.2rem] font-extrabold leading-[0.95] tracking-[-0.04em] text-white"
-                style={{ fontFamily: "'Geist', 'DM Sans', system-ui, sans-serif" }}
-              >
-                <span className="block">Birokrasi</span>
-                <span className="block">Desa Masuk</span>
-                <span
-                  className="block"
-                  style={{
-                    background: "linear-gradient(135deg, #4F6EF7 0%, #7C3AED 40%, #06B6D4 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  Era Digital.
-                </span>
-              </h1>
-            </motion.div>
-
-            <motion.p
-              variants={FADE_UP}
-              className="text-[1.05rem] text-white/45 leading-[1.75] max-w-lg mb-10 font-medium"
-            >
-              DigiDesa menyederhanakan administrasi menjadi pengalaman yang
-              cepat, transparan, dan terstruktur — dari pengajuan surat warga
-              hingga persetujuan RT/RW, semua dalam satu platform terintegrasi.
-            </motion.p>
-
-            <motion.div variants={FADE_UP} className="flex flex-col sm:flex-row items-start gap-3 mb-6">
-              <motion.button
-                onClick={() => navigate("/login")}
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                className="group flex w-full sm:w-auto justify-center items-center gap-2.5 bg-[#4F6EF7] hover:bg-[#3D5CE8] text-white font-bold px-8 py-3.5 rounded-xl transition-all text-[14px] shadow-[0_0_32px_rgba(79,110,247,0.35)]"
-              >
-                Layanan Surat
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </motion.button>
-
-              <motion.button
-                onClick={() => navigate("/login")}
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex w-full sm:w-auto justify-center items-center gap-2.5 bg-white/[0.04] hover:bg-white/[0.07] text-white/70 hover:text-white font-semibold px-8 py-3.5 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-all text-[14px]"
-              >
-                Lapor Warga
-                <ChevronRight className="w-4 h-4 text-white/30" />
-              </motion.button>
-            </motion.div>
-
-            <motion.div variants={FADE_UP} className="flex items-center gap-5">
-              <div className="flex -space-x-2.5">
-                {["BW", "SA", "MR", "DP"].map((initials, i) => (
-                  <div
-                    key={initials}
-                    className="w-7 h-7 rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#7C3AED] border-2 border-[#080B14] flex items-center justify-center text-[9px] font-bold text-white"
-                    style={{ backgroundImage: `hue-rotate(${i * 40}deg)` }}
-                  >
-                    {initials}
-                  </div>
-                ))}
-              </div>
-              <p className="text-[12px] text-white/30 font-medium">
-                <span className="text-white/60 font-bold">4.821+</span> warga aktif terdaftar
-              </p>
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <svg key={s} className="w-3 h-3 text-amber-400 fill-amber-400" viewBox="0 0 16 16">
-                    <path d="M8 0l2 5h5l-4 3 1.5 5L8 10l-4.5 3L5 8 1 5h5z" />
-                  </svg>
-                ))}
-                <span className="text-[11px] text-white/30 font-medium ml-1">4.9/5</span>
-              </div>
-            </motion.div>
-
-            <TrustStrip />
-          </motion.div>
-
-          <div className="relative hidden lg:block">
-            <FloatingCards />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── METRICS STRIP ────────────────────────────────────────────────────────────
-
-function MetricsStrip() {
-  const metrics = [
-    { value: "4.821+", label: "Warga Terdaftar", icon: Users },
-    { value: "98.7%", label: "Kepuasan Layanan", icon: TrendingUp },
-    { value: "<2 jam", label: "Waktu Proses Rata-rata", icon: Clock },
-    { value: "24/7", label: "Sistem Tersedia", icon: Activity },
-  ];
-
-  return (
-    <div className="relative bg-[#0A0D17] border-y border-white/[0.05]">
-      <NoiseTexture />
-      <div className="max-w-7xl mx-auto px-8 py-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {metrics.map(({ value, label, icon: Icon }, i) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.08, ease: EASE_SPRING }}
-              className="text-center lg:text-left"
-            >
-              <div className="flex items-center gap-2 mb-3 justify-center lg:justify-start">
-                <div className="w-6 h-6 rounded-lg bg-[#4F6EF7]/10 border border-[#4F6EF7]/20 flex items-center justify-center">
-                  <Icon className="w-3 h-3 text-[#4F6EF7]" />
-                </div>
-              </div>
-              <p className="text-[2rem] font-extrabold text-white tracking-tight leading-none mb-1.5">
-                {value}
-              </p>
-              <p className="text-[12px] font-medium text-white/35">{label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── FEATURES SECTION ─────────────────────────────────────────────────────────
-
-function FeaturesSection() {
-  const features = [
-    {
-      icon: FileText,
-      title: "Pengajuan Surat Digital",
-      desc: "Warga mengajukan dokumen kapan saja, proses persetujuan RT/RW berjalan otomatis tanpa antre.",
-      color: "blue",
-      tag: "Core",
-    },
-    {
-      icon: Users,
-      title: "Manajemen Terpusat",
-      desc: "Data profil warga dan keluarga tersimpan rapi dan mudah diakses oleh perangkat berwenang.",
-      color: "violet",
-      tag: "Data",
-    },
-    {
-      icon: BarChart3,
-      title: "Dashboard Analytics",
-      desc: "Statistik real-time mengenai pengajuan surat dan laporan masalah lingkungan sekitar.",
-      color: "cyan",
-      tag: "Insight",
-    },
-    {
-      icon: Shield,
-      title: "Zero-Trust Security",
-      desc: "Autentikasi multi-layer dengan enkripsi end-to-end untuk keamanan data warga.",
-      color: "green",
-      tag: "Security",
-    },
-    {
-      icon: Bell,
-      title: "Push Notification",
-      desc: "Notifikasi real-time ketika surat selesai diproses atau laporan ditindaklanjuti perangkat.",
-      color: "amber",
-      tag: "Automation",
-    },
-    {
-      icon: Activity,
-      title: "Transparansi Laporan",
-      desc: "Pantau tindak lanjut perbaikan fasilitas desa dari laporan yang diajukan bersama warga.",
-      color: "red",
-      tag: "Civic",
-    },
-  ];
-
-  const colorMap: Record<string, { icon: string; tag: string; border: string; glow: string; radial: string }> = {
-    blue: {
-      icon: "text-[#4F6EF7] bg-[#4F6EF7]/10 border-[#4F6EF7]/20",
-      tag: "text-[#4F6EF7] bg-[#4F6EF7]/10",
-      border: "hover:border-[#4F6EF7]/25",
-      glow: "hover:shadow-[0_8px_40px_rgba(79,110,247,0.1)]",
-      radial: "rgba(79,110,247,0.06)",
-    },
-    violet: {
-      icon: "text-violet-400 bg-violet-400/10 border-violet-400/20",
-      tag: "text-violet-400 bg-violet-400/10",
-      border: "hover:border-violet-400/25",
-      glow: "hover:shadow-[0_8px_40px_rgba(139,92,246,0.1)]",
-      radial: "rgba(139,92,246,0.06)",
-    },
-    cyan: {
-      icon: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
-      tag: "text-cyan-400 bg-cyan-400/10",
-      border: "hover:border-cyan-400/25",
-      glow: "hover:shadow-[0_8px_40px_rgba(34,211,238,0.1)]",
-      radial: "rgba(34,211,238,0.06)",
-    },
-    green: {
-      icon: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-      tag: "text-emerald-400 bg-emerald-400/10",
-      border: "hover:border-emerald-400/25",
-      glow: "hover:shadow-[0_8px_40px_rgba(52,211,153,0.1)]",
-      radial: "rgba(52,211,153,0.06)",
-    },
-    amber: {
-      icon: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-      tag: "text-amber-400 bg-amber-400/10",
-      border: "hover:border-amber-400/25",
-      glow: "hover:shadow-[0_8px_40px_rgba(251,191,36,0.1)]",
-      radial: "rgba(251,191,36,0.06)",
-    },
-    red: {
-      icon: "text-rose-400 bg-rose-400/10 border-rose-400/20",
-      tag: "text-rose-400 bg-rose-400/10",
-      border: "hover:border-rose-400/25",
-      glow: "hover:shadow-[0_8px_40px_rgba(251,113,133,0.1)]",
-      radial: "rgba(251,113,133,0.06)",
-    },
-  };
-
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
-
-  return (
-    <section ref={ref} className="relative py-32 overflow-hidden bg-[#080B14]">
-      <NoiseTexture />
-      <motion.div
-        style={{
-          y,
-          background: "radial-gradient(circle, rgba(79,110,247,0.06) 0%, transparent 70%)",
-          filter: "blur(60px)",
-        }}
-        className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none"
-      />
-
-      <div className="max-w-7xl mx-auto px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, ease: EASE_SPRING }}
-          className="max-w-2xl mb-20"
-        >
-          <div className="inline-flex items-center gap-2 mb-5 bg-[#4F6EF7]/10 border border-[#4F6EF7]/20 rounded-full px-4 py-1.5">
-            <div className="w-1 h-1 rounded-full bg-[#4F6EF7] animate-pulse" />
-            <span className="text-[11px] font-bold text-[#4F6EF7] uppercase tracking-widest">
-              Platform Capabilities
-            </span>
-          </div>
-          <h2 className="text-[2.8rem] md:text-[3.2rem] font-extrabold tracking-[-0.035em] leading-[1.05] text-white mb-5">
-            Semua yang dibutuhkan{" "}
-            <span className="text-white/25">untuk pengelolaan lingkungan modern.</span>
-          </h2>
-          <p className="text-[15px] text-white/40 font-medium leading-relaxed max-w-xl">
-            Dirancang khusus agar pengurus RW dan RT dapat berkoordinasi dengan mudah melayani warga.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map(({ icon: Icon, title, desc, color, tag }, i) => {
-            const c = colorMap[color];
-            return (
-              <motion.div
-                key={title}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.07, ease: EASE_SPRING }}
-                whileHover={{ y: -4, transition: { duration: 0.25 } }}
-                className={`group relative bg-white/[0.02] hover:bg-white/[0.04] rounded-2xl border border-white/[0.06] ${c.border} ${c.glow} p-7 cursor-pointer transition-all duration-300 overflow-hidden`}
-              >
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(circle at 50% 0%, ${c.radial} 0%, transparent 60%)`,
-                  }}
-                />
-                <div className="flex items-start justify-between mb-5">
-                  <div className={`w-11 h-11 rounded-xl border ${c.icon} flex items-center justify-center`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg ${c.tag}`}>
-                    {tag}
-                  </span>
-                </div>
-                <h3 className="text-[15px] font-bold text-white/90 mb-2.5 leading-snug">{title}</h3>
-                <p className="text-[13px] text-white/35 font-medium leading-relaxed">{desc}</p>
-                <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold text-white/25 group-hover:text-white/50 transition-colors">
-                  Pelajari selengkapnya <ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── CTA SECTION ──────────────────────────────────────────────────────────────
-
-function CtaSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 px-8 bg-[#080B14]">
-      <div className="max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: EASE_SPRING }}
-          className="relative rounded-[28px] border border-white/[0.07] overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #0D1020 0%, #0F1428 50%, #0D1020 100%)" }}
-        >
-          <NoiseTexture />
+    <section id="hero" className="relative pt-[140px] pb-24 lg:pt-[180px] lg:pb-32 bg-slate-50 overflow-hidden flex items-center min-h-[90vh]">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-10 right-0 w-[600px] h-[600px] bg-red-100 rounded-full blur-[120px] -z-10 translate-x-1/3 -translate-y-1/3 opacity-50 animate-pulse" />
+      <div className="absolute bottom-10 left-0 w-[500px] h-[500px] bg-blue-50 rounded-full blur-[100px] -z-10 -translate-x-1/3 translate-y-1/3 opacity-70" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-8 w-full relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+        
+        {/* Left Content */}
+        <motion.div initial="hidden" animate="visible" variants={FADE_UP} className="lg:col-span-6">
+          <div className="inline-flex items-center gap-2 mb-6 bg-white border border-slate-200 rounded-full p-1.5 shadow-sm">
+            <span className="flex h-6 w-6 items-center justify-center relative bg-red-50 rounded-full">
+              <span className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-red-400 opacity-50"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+            </span>
+            <span className="text-[11px] font-black text-slate-800 uppercase tracking-widest pr-4">
+              Pembaruan Sistem 2026
+            </span>
+          </div>
+          
+          <h1 className="text-[3.5rem] sm:text-[4.5rem] font-extrabold leading-[1.05] tracking-tight text-slate-900 mb-6">
+            Birokrasi Desa <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-500">
+              Era Digital.
+            </span>
+          </h1>
+          
+          <p className="text-lg text-slate-600 leading-relaxed mb-10 max-w-lg font-medium">
+            Tinggalkan cara lama. Ajukan surat, bayar iuran warga, dan lapor keluhan cukup melalui satu platform terpadu. Lebih cepat, transparan, dan dapat dipantau 24/7.
+          </p>
 
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79,110,247,0.2) 0%, transparent 60%)",
-            }}
-          />
-          <div
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse at 50% 100%, rgba(124,58,237,0.1) 0%, transparent 70%)",
-            }}
-          />
-
-          <div
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
-            style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.8) 1px, transparent 1px)`,
-              backgroundSize: "48px 48px",
-            }}
-          />
-
-          <div className="relative z-10 text-center px-12 py-20">
-            <div className="inline-flex items-center gap-2 mb-6 bg-white/[0.04] border border-white/[0.08] rounded-full px-4 py-2">
-              <Globe className="w-3.5 h-3.5 text-[#4F6EF7]" />
-              <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">
-                Portal Warga & Pengurus
-              </span>
-            </div>
-            <h2 className="text-[2.8rem] md:text-[3.4rem] font-extrabold tracking-[-0.035em] text-white leading-[1.05] mb-6">
-              Siap mempermudah
-              <br />
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #4F6EF7 0%, #7C3AED 50%, #06B6D4 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                birokrasi lingkunganmu?
-              </span>
-            </h2>
-            <p className="text-[15px] text-white/35 max-w-xl mx-auto mb-10 font-medium leading-relaxed">
-              Gabung sekarang dan nikmati kemudahan akses informasi serta administrasi dalam satu platform terintegrasi.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <motion.button
-                onClick={() => navigate("/login")}
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-2.5 bg-[#4F6EF7] hover:bg-[#3D5CE8] text-white font-bold px-8 py-3.5 rounded-xl transition-all text-[14px] w-full sm:w-auto justify-center shadow-[0_0_40px_rgba(79,110,247,0.3)]"
-              >
-                Masuk Portal Sekarang
-                <ArrowRight className="w-4 h-4" />
-              </motion.button>
-              <button className="text-white/35 font-semibold text-[14px] hover:text-white/60 transition-colors px-6 py-3.5">
-                Lihat Panduan →
-              </button>
-            </div>
-
-            <div className="flex items-center justify-center gap-8 mt-12 pt-10 border-t border-white/[0.05]">
-              {[
-                { icon: Shield, text: "Keamanan Terjamin" },
-                { icon: Zap, text: "Setup Dalam Menit" },
-                { icon: Users, text: "Dukungan 24/7" },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-2 text-white/25">
-                  <Icon className="w-3.5 h-3.5" />
-                  <span className="text-[12px] font-semibold">{text}</span>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <button
+              onClick={() => navigate("/login")}
+              className="group flex w-full sm:w-auto justify-center items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-red-600/20"
+            >
+              Ajukan Surat Sekarang
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => scrollToSection("panduan")}
+              className="flex w-full sm:w-auto justify-center items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-bold px-8 py-4 rounded-2xl border border-slate-200 shadow-sm transition-all"
+            >
+              Pelajari Cara Kerja
+            </button>
+          </div>
+          
+          <div className="mt-12 flex items-center gap-6 pt-8 border-t border-slate-200/60">
+            <div className="flex -space-x-3">
+               {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-10 h-10 rounded-full border-2 border-slate-50 bg-slate-200 flex items-center justify-center overflow-hidden">
+                   <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=warga${i}`} alt="user" className="w-full h-full object-cover opacity-80" />
                 </div>
-              ))}
+               ))}
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-900">Bergabung dengan 4.821+ Warga</p>
+              <p className="text-xs text-slate-500 font-medium mt-1 flex items-center gap-1.5">
+                <CheckCircle2 size={12} className="text-emerald-500" />
+                Terdaftar dan terverifikasi kelurahan
+              </p>
             </div>
           </div>
+        </motion.div>
+
+        {/* Right Content - Mockup Floating Card */}
+        <motion.div initial={{ opacity: 0, x: 40, rotate: 2 }} animate={{ opacity: 1, x: 0, rotate: 0 }} transition={{ duration: 1.2, ease: EASE_SPRING }} className="relative hidden lg:block lg:col-span-6">
+           <div className="absolute inset-0 bg-gradient-to-tr from-red-600/5 to-transparent rounded-[3rem] -z-10 translate-x-4 translate-y-4" />
+           
+           <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-2xl shadow-slate-200/80 relative">
+             <div className="flex items-center justify-between mb-8">
+               <div className="flex items-center gap-4">
+                 <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center">
+                   <FileText className="text-red-600 w-7 h-7" />
+                 </div>
+                 <div>
+                   <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Live Tracking</p>
+                   <h4 className="font-bold text-slate-900 text-lg">Pengantar SKCK</h4>
+                 </div>
+               </div>
+               <span className="px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs rounded-lg uppercase tracking-wider">
+                 DIPROSES
+               </span>
+             </div>
+             
+             <div className="space-y-0 relative before:absolute before:inset-0 before:ml-[1.4rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                {/* Timeline Items */}
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active py-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full border-4 border-white bg-emerald-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10" />
+                  <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] bg-slate-50 p-4 rounded-2xl border border-slate-100 ml-4 md:ml-0">
+                    <p className="font-bold text-slate-900 text-sm">Validasi RT 01</p>
+                    <p className="text-xs text-slate-500 mt-1">Selesai • 14:30 WIB</p>
+                  </div>
+                </div>
+
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active py-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full border-4 border-white bg-red-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm relative z-10">
+                    <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  </div>
+                  <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-2xl border-2 border-red-100 ml-4 md:ml-0 shadow-lg shadow-red-500/10">
+                    <p className="font-bold text-slate-900 text-sm">Tanda Tangan Kades</p>
+                    <p className="text-xs text-slate-500 mt-1">Sedang berlangsung</p>
+                  </div>
+                </div>
+
+                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group py-4 opacity-50">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full border-4 border-white bg-slate-200 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 relative z-10" />
+                  <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] bg-slate-50 p-4 rounded-2xl border border-slate-100 ml-4 md:ml-0">
+                    <p className="font-bold text-slate-900 text-sm">Dokumen Siap</p>
+                    <p className="text-xs text-slate-500 mt-1">Menunggu tahapan sebelumnya</p>
+                  </div>
+                </div>
+             </div>
+             
+             <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+               <div className="flex items-center gap-3 text-xs text-slate-500 font-bold">
+                 <Shield className="w-4 h-4 text-emerald-500" /> Tervalidasi SSL
+               </div>
+               <p className="text-[10px] font-black uppercase tracking-widest text-slate-300">Resmi Desa</p>
+             </div>
+           </div>
+           
+           {/* Decorative floating widgets */}
+           <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 4 }} className="absolute -bottom-10 -left-10 bg-white p-4 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center gap-4">
+             <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500">
+               <CheckCircle2 size={20} />
+             </div>
+             <div>
+               <p className="text-sm font-bold text-slate-900">Notifikasi Masuk</p>
+               <p className="text-xs font-medium text-slate-500">Surat telah dicetak</p>
+             </div>
+           </motion.div>
+
         </motion.div>
       </div>
     </section>
   );
 }
 
-// ─── FOOTER ───────────────────────────────────────────────────────────────────
-
-function Footer() {
+function BentoLayanan() {
+  const navigate = useNavigate();
   return (
-    <footer className="border-t border-white/[0.05] py-12 px-8 bg-[#080B14]">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#4F6EF7] to-[#7C3AED] flex items-center justify-center shadow-[0_0_12px_rgba(79,110,247,0.4)]">
-            <Layers className="w-3.5 h-3.5 text-white" />
-          </div>
-          <span className="font-bold text-white/80 tracking-tight">
-            Digi<span className="text-[#4F6EF7]">Desa</span>
-          </span>
-          <span className="text-white/20 text-[12px] font-medium ml-1">· Administrasi Terpadu</span>
+    <section id="layanan" className="py-24 bg-white relative z-20">
+      <div className="max-w-7xl mx-auto px-6 md:px-8">
+        <div className="text-center mb-16 max-w-2xl mx-auto">
+          <p className="text-sm font-black text-red-600 uppercase tracking-[0.2em] mb-4">Pusat Layanan</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Satu Pintu Beragam Solusi</h2>
+          <p className="text-slate-500 text-lg">Semua urusan birokrasi dan transparansi desa kini dapat diakses secara real-time dari perangkat apa pun.</p>
         </div>
-        <p className="text-[12px] font-medium text-white/20">
-          © {new Date().getFullYear()} DigiDesa Lingkungan. Hak Cipta Dilindungi.
-        </p>
-        <div className="flex gap-6">
-          {["Tentang", "Bantuan", "Privasi", "Status"].map((l) => (
-            <button
-              key={l}
-              type="button"
-              className="text-[12px] text-white/25 hover:text-white/60 transition-colors font-semibold"
-            >
-              {l}
-            </button>
-          ))}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">
+          {/* Fitur 1 - Pengajuan Surat (Besar) */}
+          <div className="md:col-span-2 bg-slate-50 rounded-[2rem] p-10 border border-slate-100 flex flex-col justify-between group hover:bg-red-50 hover:border-red-100 transition-all duration-300 relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 opacity-10 group-hover:opacity-20 transition-all translate-x-10 translate-y-10 group-hover:scale-110">
+              <FileText size={200} />
+            </div>
+            <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center border border-slate-200 group-hover:border-red-200 mb-6 relative z-10">
+              <FileText className="text-red-600 w-7 h-7" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-red-900">Pengajuan Surat Online</h3>
+              <p className="text-sm font-medium text-slate-500 max-w-sm group-hover:text-red-700/70">Urus SKTM, Surat Domisili, dan Pengantar SKCK tanpa perlu bolak-balik ke kantor desa. Pantau status validasinya secara live.</p>
+            </div>
+          </div>
+
+          {/* Fitur 2 - Pelaporan Warga */}
+          <div className="bg-slate-50 rounded-[2rem] p-10 border border-slate-100 flex flex-col justify-between group hover:bg-amber-50 hover:border-amber-100 transition-all duration-300 relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 opacity-5 group-hover:opacity-20 transition-all translate-x-5 translate-y-5 group-hover:scale-110">
+              <Activity size={150} />
+            </div>
+            <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center border border-slate-200 group-hover:border-amber-200 mb-6 relative z-10">
+              <AlertTriangle className="text-amber-500 w-7 h-7" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-amber-900">Lapor Warga</h3>
+              <p className="text-sm font-medium text-slate-500 group-hover:text-amber-700/70">Laporkan insiden, fasilitas rusak, atau masalah keamanan langsung ke petugas.</p>
+            </div>
+          </div>
+
+          {/* Fitur 3 - Keuangan Desa */}
+          <div className="bg-slate-50 rounded-[2rem] p-10 border border-slate-100 flex flex-col justify-between group hover:bg-emerald-50 hover:border-emerald-100 transition-all duration-300 relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 opacity-5 group-hover:opacity-20 transition-all translate-x-5 translate-y-5 group-hover:scale-110">
+              <BarChart3 size={150} />
+            </div>
+            <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center border border-slate-200 group-hover:border-emerald-200 mb-6 relative z-10">
+              <TrendingUp className="text-emerald-500 w-7 h-7" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2 group-hover:text-emerald-900">Transparansi Dana</h3>
+              <p className="text-sm font-medium text-slate-500 group-hover:text-emerald-700/70">Pantau laporan pengeluaran, pemasukan, dan saldo kas desa secara terbuka.</p>
+            </div>
+          </div>
+
+          {/* Fitur 4 - Layanan Kependudukan */}
+          <div className="md:col-span-2 bg-slate-900 rounded-[2rem] p-10 border border-slate-800 flex flex-col justify-between group hover:bg-slate-800 transition-all duration-300 relative overflow-hidden">
+             <div className="absolute right-10 inset-y-0 flex items-center opacity-20 group-hover:opacity-100 transition-all group-hover:translate-x-5">
+              <ArrowRight size={100} className="text-slate-700" />
+            </div>
+            <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 relative z-10">
+              <Database className="text-white w-7 h-7" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-black text-white tracking-tight mb-2">Sistem Kependudukan Valid</h3>
+              <p className="text-sm font-medium text-slate-400 max-w-md">Data warga tersinkronisasi. Verifikasi menggunakan KTP menjamin sistem bebas dari akun fiktif, meningkatkan keamanan lingkungan.</p>
+              
+              <button onClick={() => navigate('/login')} className="mt-6 px-6 py-2.5 bg-white text-slate-900 rounded-xl font-bold text-sm hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                Gabung Sistem Sekarang
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustStrip() {
+  const metrics = [
+    { value: "4.821+", label: "Warga Terverifikasi", icon: Users },
+    { value: "98.7%", label: "Tingkat Kepuasan", icon: TrendingUp },
+    { value: "<2 Jam", label: "Waktu Proses Surat", icon: Clock },
+    { value: "100%", label: "Transparansi Dana", icon: Shield },
+  ];
+
+  return (
+    <div id="statistik" className="bg-red-600 py-16 relative z-20 overflow-hidden">
+      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-12 relative z-10">
+        {metrics.map((m, i) => (
+          <div key={i} className="text-center flex flex-col items-center">
+             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm border border-white/10">
+               <m.icon className="text-white w-7 h-7" />
+             </div>
+             <h4 className="text-3xl font-black text-white mb-1 tracking-tight">{m.value}</h4>
+             <p className="text-sm font-bold text-red-200 uppercase tracking-widest">{m.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MegaFooter() {
+  return (
+    <footer className="bg-slate-950 pt-20 pb-10 border-t border-slate-900">
+      <div className="max-w-7xl mx-auto px-6 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="relative w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center">
+                <Layers className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold text-white tracking-[-0.02em] text-xl">
+                Digi<span className="text-red-500">Desa</span>
+              </span>
+            </div>
+            <p className="text-slate-400 text-sm font-medium leading-relaxed mb-6">
+              Platform pelayanan publik desa terintegrasi. Menghadirkan inovasi birokrasi yang cepat, transparan, dan dapat diakses dari mana saja.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-white font-black uppercase tracking-widest text-sm mb-6">Tautan Cepat</h4>
+            <ul className="space-y-4">
+              {['Beranda', 'Ajukan Surat', 'Lapor Keluhan', 'Cek Saldo Desa'].map((item) => (
+                <li key={item}>
+                  <button onClick={() => window.scrollTo(0,0)} className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    {item}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-black uppercase tracking-widest text-sm mb-6">Dukungan</h4>
+            <ul className="space-y-4">
+              {['Panduan Pengguna', 'FAQ', 'Kebijakan Privasi', 'Syarat & Ketentuan'].map((item) => (
+                <li key={item}>
+                  <button onClick={() => scrollToSection('panduan')} className="text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                    {item}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white font-black uppercase tracking-widest text-sm mb-6">Hubungi Kami</h4>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3 text-slate-400 text-sm font-medium">
+                <MapPin size={18} className="text-red-500 shrink-0 mt-0.5" />
+                <span>Kantor Kepala Desa Cisaladah<br/>Jl. Cisaladah No. 1, Bandung</span>
+              </li>
+              <li className="flex items-center gap-3 text-slate-400 text-sm font-medium">
+                <Phone size={18} className="text-red-500 shrink-0" />
+                <span>(022) 8765 4321</span>
+              </li>
+              <li className="flex items-center gap-3 text-slate-400 text-sm font-medium">
+                <Mail size={18} className="text-red-500 shrink-0" />
+                <span>cs@cisaladah.desa.id</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-slate-500 text-sm font-medium">© 2026 Pemerintah Kelurahan DigiDesa. Hak Cipta Dilindungi.</p>
+          <div className="flex items-center gap-2">
+             <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sistem Online & Stabil</span>
+          </div>
         </div>
       </div>
     </footer>
   );
 }
 
-// ─── HOME ─────────────────────────────────────────────────────────────────────
-
 export default function Home() {
   return (
-    <div
-      className="min-h-screen antialiased overflow-x-hidden"
-      style={{ backgroundColor: "#080B14", fontFamily: "'DM Sans', 'Geist', system-ui, sans-serif" }}
-    >
+    <div className="min-h-screen bg-slate-50 selection:bg-red-200 selection:text-red-900 font-sans scroll-smooth">
       <Navbar />
-      <main>
-        <Hero />
-        <MetricsStrip />
-        <FeaturesSection />
-        <CtaSection />
-      </main>
-      <Footer />
+      <Hero />
+      
+      <BentoLayanan />
+
+      <div id="panduan" className="py-24 max-w-7xl mx-auto px-6 md:px-8 relative z-20">
+        <div className="text-center mb-16">
+          <p className="text-sm font-black text-red-600 uppercase tracking-[0.2em] mb-4">Panduan Singkat</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">Mudah, Bahkan Bagi Pemula</h2>
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto">Sistem kami dirancang sangat intuitif. Anda hanya butuh KTP untuk mendaftar dan mulai mengakses layanan administrasi.</p>
+        </div>
+        
+        {/* Panduan Penggunaan Non-IT */}
+        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-2 md:p-8">
+          <PanduanWarga />
+        </div>
+      </div>
+
+      <TrustStrip />
+      <MegaFooter />
     </div>
   );
 }

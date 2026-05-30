@@ -21,6 +21,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
+import WargaTopNav from "../components/WargaTopNav";
 
 type FilterType = "ALL" | "INCOME" | "EXPENSE";
 
@@ -105,43 +106,12 @@ const getScopeLabel = (filter: FilterType) => {
 };
 
 const getBarColor = (label: string) => {
-  if (label === "Infrastruktur") return "bg-blue-500";
+  if (label === "Infrastruktur") return "bg-red-500";
   if (label === "Bantuan Sosial") return "bg-emerald-500";
   return "bg-amber-500";
 };
 
-const FinansialSidebar = ({ navigate, items }: { navigate: (path: string) => void; items: MenuItem[] }) => (
-  <aside className="hidden lg:flex w-72 bg-white border-r border-slate-100 flex-col sticky top-0 h-screen z-50">
-    <button type="button" className="w-full px-8 py-8 flex items-center gap-4 text-left border-b border-slate-50" onClick={() => navigate("/dashboard-warga")}>
-      <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-700 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-        <Building2 className="w-5 h-5 text-white" />
-      </div>
-      <div>
-        <p className="font-black text-slate-900 tracking-tight leading-none text-base">DIGI<span className="text-blue-600">DESA</span></p>
-        <p className="text-xs text-slate-400 mt-1.5 font-semibold">Panel Warga Transparan</p>
-      </div>
-    </button>
 
-    <nav className="flex-1 px-6 py-8 space-y-2">
-      <p className="px-4 mb-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Navigasi Utama</p>
-      {items.map((item) => {
-        const Icon = item.i;
-        return (
-          <button
-            key={item.n}
-            onClick={() => navigate(item.p)}
-            className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
-              item.active ? "bg-blue-600 text-white shadow-lg shadow-blue-500/15" : "text-slate-600 hover:bg-blue-50/50 hover:text-blue-600"
-            }`}
-          >
-            <Icon size={16} strokeWidth={2.5} />
-            {item.n}
-          </button>
-        );
-      })}
-    </nav>
-  </aside>
-);
 
 const MetricCard = ({
   title,
@@ -161,14 +131,14 @@ const MetricCard = ({
   active?: boolean;
 }) => {
   const cardClass = (() => {
-    if (tone === "blue") return active ? "bg-blue-600 text-white border-blue-600" : "bg-white border-slate-200 hover:border-blue-200";
+    if (tone === "blue") return active ? "bg-red-600 text-white border-red-600" : "bg-white border-slate-200 hover:border-blue-200";
     if (tone === "emerald") return active ? "bg-emerald-50 border-emerald-300 shadow-sm" : "bg-white border-slate-200 hover:border-emerald-200";
     if (tone === "red") return active ? "bg-red-50 border-red-300 shadow-sm" : "bg-white border-slate-200 hover:border-red-200";
     return "bg-white border-slate-200";
   })();
 
   const helperClass = (() => {
-    if (tone === "blue") return active ? "text-blue-100" : "text-blue-600";
+    if (tone === "blue") return active ? "text-red-100" : "text-red-600";
     if (tone === "emerald") return active ? "text-emerald-700" : "text-slate-500";
     if (tone === "red") return active ? "text-red-700" : "text-slate-500";
     return "text-slate-500";
@@ -177,7 +147,7 @@ const MetricCard = ({
   if (onClick) {
     return (
       <button type="button" onClick={onClick} className={`text-left p-6 rounded-2xl border transition-all ${cardClass}`}>
-        <p className={`text-sm font-semibold ${tone === "blue" && active ? "text-blue-100" : "text-slate-500"}`}>{title}</p>
+        <p className={`text-sm font-semibold ${tone === "blue" && active ? "text-red-100" : "text-slate-500"}`}>{title}</p>
         <h3 className={`text-2xl font-bold mt-2 tracking-tight truncate ${tone === "blue" && active ? "text-white" : "text-slate-950"}`}>{value}</h3>
         <p className={`text-xs font-medium mt-4 flex items-center gap-1.5 ${helperClass}`}>
           {icon}
@@ -214,13 +184,13 @@ const TransactionRow = ({ item, onOpen }: { item: Transaction; onOpen: (trx: Tra
         <p className="text-xs text-slate-400 mt-1 truncate">{safeFormatTanggal(rawDate)}</p>
       </td>
       <td className="px-5 py-5 text-center">
-        <span className="inline-flex max-w-full px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold truncate">{item.category || "General"}</span>
+        <span className="inline-flex max-w-full px-2.5 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-semibold truncate">{item.category || "General"}</span>
       </td>
       <td className={`px-5 py-5 text-sm font-bold text-right truncate ${isIncome ? "text-emerald-600" : "text-red-600"}`}>
         {isIncome ? "+ " : "- "}{formatIDR(item.amount || 0)}
       </td>
       <td className="px-5 py-5 text-center">
-        <button type="button" onClick={() => onOpen(item)} className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center mx-auto shadow-sm">
+        <button type="button" onClick={() => onOpen(item)} className="w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all flex items-center justify-center mx-auto shadow-sm">
           <Eye size={14} />
         </button>
       </td>
@@ -259,7 +229,7 @@ const DetailModal = ({
       <motion.div initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-slate-100 my-8">
         <div className="flex-1 p-8 lg:p-10 border-r border-slate-100 bg-white">
           <div className="flex justify-between items-start mb-6">
-            <div className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-red-600 text-white flex items-center justify-center">
               <Files size={20} />
             </div>
             <button type="button" onClick={onClose} className="w-9 h-9 flex items-center justify-center bg-slate-50 text-slate-400 hover:text-slate-900 rounded-full transition-all">
@@ -281,7 +251,7 @@ const DetailModal = ({
             </div>
             <div className="flex justify-between gap-5 py-3 border-b border-dashed border-slate-100">
               <span className="text-slate-400 font-medium">Alokasi / Penerima</span>
-              <span className="text-blue-600 text-right">{item.recipient || "Kas Internal"}</span>
+              <span className="text-red-600 text-right">{item.recipient || "Kas Internal"}</span>
             </div>
             <div className="flex justify-between gap-5 py-3 border-b border-dashed border-slate-100">
               <span className="text-slate-400 font-medium">Nominal Mutasi</span>
@@ -310,7 +280,7 @@ const DetailModal = ({
           </div>
 
           {evidenceUrl && (
-            <a href={`http://localhost:5000${evidenceUrl}`} target="_blank" rel="noreferrer" className="w-full py-4 bg-slate-900 hover:bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl text-center shadow-md transition-all mt-6">
+            <a href={`http://localhost:5000${evidenceUrl}`} target="_blank" rel="noreferrer" className="w-full py-4 bg-slate-900 hover:bg-red-600 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl text-center shadow-md transition-all mt-6">
               Buka Lampiran Nota
             </a>
           )}
@@ -403,7 +373,7 @@ export default function Finansial() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDFEFF]">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+          <Loader2 className="w-10 h-10 animate-spin text-red-600" />
           <p className="text-sm font-semibold text-slate-500">Sinkronisasi data kas desa...</p>
         </div>
       </div>
@@ -411,29 +381,26 @@ export default function Finansial() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFEFF] font-sans antialiased flex overflow-hidden">
-      <FinansialSidebar navigate={navigate} items={menuItems} />
+    <div className="min-h-screen bg-slate-50 font-sans antialiased flex flex-col text-slate-900 selection:bg-red-200">
+      <WargaTopNav />
 
-      <main className="flex-1 overflow-y-auto relative h-screen">
-        <header className="h-20 bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40 px-6 lg:px-10 flex items-center justify-between">
-          <div className="flex items-center gap-4 min-w-0">
-            <button onClick={() => navigate("/dashboard-warga")} className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0">
-              <ArrowLeft size={20} />
-            </button>
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-slate-950 tracking-tight truncate">Transparansi Keuangan</h1>
-              <p className="text-sm text-slate-500 mt-1 truncate">Pantau pemasukan, pengeluaran, bukti nota, dan saldo kas desa secara terbuka.</p>
+      <main className="flex-1">
+        <div className="bg-white border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Transparansi Keuangan</h1>
+              <p className="text-sm font-medium text-slate-500 mt-1">Pantau pemasukan, pengeluaran, bukti nota, dan saldo kas desa secara terbuka.</p>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-xl border border-emerald-100">
+              <CheckCircle2 size={16} className="text-emerald-600" />
+              <p className="text-xs font-bold text-emerald-800 uppercase tracking-widest">Teraudit Digital</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 bg-emerald-50 rounded-2xl border border-emerald-100 shrink-0">
-            <CheckCircle2 size={14} className="text-emerald-600" />
-            <p className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Teraudit Digital</p>
-          </div>
-        </header>
+        </div>
 
         <div className="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto w-full">
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-            <MetricCard title="Saldo kas desa" value={formatIDR(summaryBalance)} helper={typeFilter === "ALL" ? "Semua transaksi tampil" : "Klik untuk reset filter"} tone="blue" active={typeFilter === "ALL"} onClick={() => setTypeFilter("ALL")} icon={<CheckCircle2 size={14} className={typeFilter === "ALL" ? "text-blue-100" : "text-blue-600"} />} />
+            <MetricCard title="Saldo kas desa" value={formatIDR(summaryBalance)} helper={typeFilter === "ALL" ? "Semua transaksi tampil" : "Klik untuk reset filter"} tone="blue" active={typeFilter === "ALL"} onClick={() => setTypeFilter("ALL")} icon={<CheckCircle2 size={14} className={typeFilter === "ALL" ? "text-red-100" : "text-red-600"} />} />
             <MetricCard title="Total pemasukan" value={formatIDR(summaryIncome)} helper={typeFilter === "INCOME" ? "Filter pemasukan aktif" : "Klik untuk filter"} tone="emerald" active={typeFilter === "INCOME"} onClick={() => setTypeFilter("INCOME")} icon={<TrendingUp size={19} />} />
             <MetricCard title="Total pengeluaran" value={formatIDR(summaryExpense)} helper={typeFilter === "EXPENSE" ? "Filter pengeluaran aktif" : "Klik untuk filter"} tone="red" active={typeFilter === "EXPENSE"} onClick={() => setTypeFilter("EXPENSE")} icon={<TrendingDown size={19} />} />
             <MetricCard title="Dana siaga" value={formatIDR(reserveFunds)} helper="Estimasi 20% dari saldo kas" tone="neutral" icon={<Wallet size={19} />} />
@@ -480,7 +447,7 @@ export default function Finansial() {
             <div className="space-y-6 min-w-0">
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <h3 className="font-bold text-slate-950 mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
                     <PieChart size={19} />
                   </div>
                   Statistik Belanja
@@ -493,11 +460,11 @@ export default function Finansial() {
               </div>
 
               <div className="bg-slate-900 rounded-2xl p-6 text-white relative overflow-hidden">
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl" />
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-red-600/20 rounded-full blur-3xl" />
                 <h4 className="text-sm font-semibold mb-2 text-slate-400">Target penyerapan anggaran</h4>
                 <p className="text-4xl font-bold tracking-tight leading-none">94.2%</p>
                 <div className="mt-6 h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 w-[94.2%] rounded-full" />
+                  <div className="h-full bg-red-500 w-[94.2%] rounded-full" />
                 </div>
                 <p className="text-xs font-medium mt-4 text-slate-400">Monitoring Kas DigiDesa v1.0</p>
               </div>

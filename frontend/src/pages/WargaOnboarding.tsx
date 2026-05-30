@@ -136,7 +136,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
   if (isFetchingProfile) return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
       <div className="flex flex-col items-center gap-3">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        <Loader2 className="w-10 h-10 animate-spin text-red-600" />
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Memeriksa Otoritas Akun...</p>
       </div>
     </div>
@@ -159,7 +159,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
         {(status === "INCOMPLETE" || status === "REJECTED") && (
           <div>
             <div className="flex items-center gap-4 mb-8">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg ${status === 'REJECTED' ? 'bg-red-500 shadow-red-500/20' : 'bg-blue-600 shadow-blue-600/20'}`}>
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg ${status === 'REJECTED' ? 'bg-red-500 shadow-red-500/20' : 'bg-red-600 shadow-red-600/20'}`}>
                 {status === 'REJECTED' ? <XCircle size={26} /> : <ShieldAlert size={26} />}
               </div>
               <div>
@@ -194,7 +194,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                     type="number" 
                     value={formData.no_kk}
                     onChange={(e) => setFormData({...formData, no_kk: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold focus:border-blue-600 outline-none transition-colors" 
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold focus:border-red-600 outline-none transition-colors" 
                     placeholder="Masukkan 16 digit nomor KK" 
                   />
                   <FileText size={16} className="absolute left-4 text-slate-400" />
@@ -212,7 +212,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                       type="text" 
                       value={formData.alamat}
                       onChange={(e) => setFormData({...formData, alamat: e.target.value})}
-                      className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold focus:border-blue-600 outline-none transition-colors" 
+                      className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold focus:border-red-600 outline-none transition-colors" 
                       placeholder="Contoh: Jl. Cisaladah No. 12 RT 01" 
                     />
                     <Home size={16} className="absolute left-4 text-slate-400" />
@@ -230,7 +230,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                         maxLength={5}
                         value={formData.rt}
                         onChange={(e) => setFormData({...formData, rt: e.target.value})}
-                        className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-10 pr-4 text-sm font-bold focus:border-blue-600 outline-none transition-colors" 
+                        className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-10 pr-4 text-sm font-bold focus:border-red-600 outline-none transition-colors" 
                         placeholder="Misal: 01" 
                       />
                       <MapPin size={14} className="absolute left-4 text-slate-400" />
@@ -247,7 +247,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                         maxLength={5}
                         value={formData.rw}
                         onChange={(e) => setFormData({...formData, rw: e.target.value})}
-                        className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-10 pr-4 text-sm font-bold focus:border-blue-600 outline-none transition-colors" 
+                        className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-10 pr-4 text-sm font-bold focus:border-red-600 outline-none transition-colors" 
                         placeholder="Misal: 10" 
                       />
                       <MapPin size={14} className="absolute left-4 text-slate-400" />
@@ -264,7 +264,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                     id="status_hubungan"
                     value={formData.status_hubungan}
                     onChange={(e) => setFormData({...formData, status_hubungan: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 px-4 text-sm font-bold focus:border-blue-600 outline-none transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 px-4 text-sm font-bold focus:border-red-600 outline-none transition-colors appearance-none cursor-pointer"
                   >
                     <option value="Kepala Keluarga">Kepala Keluarga</option>
                     <option value="Istri">Istri</option>
@@ -279,7 +279,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                     id="status_tinggal"
                     value={formData.status_tinggal}
                     onChange={(e) => setFormData({...formData, status_tinggal: e.target.value})}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 px-4 text-sm font-bold focus:border-blue-600 outline-none transition-colors appearance-none cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 px-4 text-sm font-bold focus:border-red-600 outline-none transition-colors appearance-none cursor-pointer"
                   >
                     <option value="TETAP">Warga Tetap (Lokal Desa)</option>
                     <option value="PENDATANG">Warga Pendatang (Kontrak/Kos)</option>
@@ -290,7 +290,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
               {/* COMPONENT UPLOAD FOTO BUKTI */}
               <div>
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1.5 block">Unggah Foto KTP / Berkas KK</span>
-                <label className="w-full h-40 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 hover:bg-slate-50 hover:border-blue-500 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer relative overflow-hidden group">
+                <label className="w-full h-40 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50/50 hover:bg-slate-50 hover:border-red-500 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer relative overflow-hidden group">
                   <input 
                     type="file" 
                     accept="image/*" 
@@ -305,7 +305,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
                     </div>
                   ) : (
                     <div className="text-center text-slate-400">
-                      <UploadCloud className="mx-auto mb-2 group-hover:text-blue-600 group-hover:scale-110 transition-transform" size={36} />
+                      <UploadCloud className="mx-auto mb-2 group-hover:text-red-600 group-hover:scale-110 transition-transform" size={36} />
                       <p className="text-xs font-black uppercase text-slate-700 tracking-wide">Pilih Gambar KTP</p>
                       <p className="text-[10px] font-medium mt-1">Format JPG, JPEG, PNG (Maks 5MB)</p>
                     </div>
@@ -316,7 +316,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full py-4 mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl shadow-lg shadow-blue-600/20 flex justify-center items-center gap-2 transition-all"
+                className="w-full py-4 mt-4 bg-red-600 hover:bg-red-700 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl shadow-lg shadow-red-600/20 flex justify-center items-center gap-2 transition-all"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Kirim Formulir Verifikasi"}
               </button>
@@ -348,7 +348,7 @@ export default function WargaOnboarding({ userStatus, onVerified }: OnboardingPr
 
             <button 
               onClick={checkCurrentStatus}
-              className="mt-10 px-8 py-3.5 bg-slate-900 hover:bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-md transition-all flex items-center gap-2"
+              className="mt-10 px-8 py-3.5 bg-slate-900 hover:bg-red-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-md transition-all flex items-center gap-2"
             >
               Refresh Status Akun
             </button>

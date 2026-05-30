@@ -15,6 +15,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+import WargaTopNav from "../components/WargaTopNav";
 
 const EASE_SPRING = [0.16, 1, 0.3, 1];
 
@@ -77,27 +78,8 @@ export default function Lapor() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F9FC] font-sans antialiased text-slate-900">
-      <header className="sticky top-0 z-50 border-b border-white/70 bg-white/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
-          <div className="flex min-w-0 items-center gap-4">
-            <button
-              onClick={() => navigate("/dashboard-warga")}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-slate-200 text-slate-500 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Pusat Aduan Warga</p>
-              <h1 className="truncate text-lg font-black tracking-tight text-slate-950">Lapor Desa</h1>
-            </div>
-          </div>
-          <div className="hidden items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-2 text-xs font-bold text-blue-700 sm:flex">
-            <ShieldCheck size={14} />
-            Aduan rahasia dan terpantau
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-900 selection:bg-red-200">
+      <WargaTopNav />
 
       <main className="mx-auto max-w-7xl px-6 py-10 lg:px-10 lg:py-12">
         {step === 1 ? (
@@ -110,12 +92,12 @@ export default function Lapor() {
               className="lg:col-span-2 space-y-6"
             >
               <div className="rounded-[2rem] border border-white bg-white p-7 shadow-[0_24px_60px_-30px_rgba(15,23,42,0.25)]">
-                <span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">
+                <span className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-red-700">
                   <Sparkles size={12} />
                   Laporan Lebih Terarah
                 </span>
                 <h2 className="mt-6 text-4xl font-black leading-[1.08] tracking-tight text-slate-950">
-                  Buat aduan yang <span className="italic text-blue-600">jelas, cepat, dan tenang.</span>
+                  Buat aduan yang <span className="italic text-red-600">jelas, cepat, dan tenang.</span>
                 </h2>
                 <p className="mt-5 text-sm font-medium leading-relaxed text-slate-500">
                   Laporkan kendala lingkungan tanpa ribet. Visualnya dibuat lebih halus agar fokus Anda tetap ke isi laporan dan tindak lanjutnya.
@@ -126,7 +108,7 @@ export default function Lapor() {
                     const Icon = item.icon;
                     return (
                       <div key={item.title} className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-red-600 shadow-sm">
                           <Icon size={18} />
                         </div>
                         <div className="min-w-0">
@@ -153,7 +135,7 @@ export default function Lapor() {
                 </div>
                 <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-50 text-red-600">
                       <Clock3 size={18} />
                     </div>
                     <div>
@@ -167,7 +149,7 @@ export default function Lapor() {
 
             <motion.section initial="hidden" animate="visible" variants={FADE_UP} custom={1} className="lg:col-span-3">
               <form onSubmit={handleKirimPengaduan} className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-[0_26px_80px_-36px_rgba(15,23,42,0.28)]">
-                <div className="border-b border-slate-100 bg-gradient-to-r from-slate-900 via-slate-800 to-blue-900 px-7 py-7 text-white sm:px-10">
+                <div className="border-b border-slate-100 bg-gradient-to-r from-slate-900 via-slate-800 to-red-900 px-7 py-7 text-white sm:px-10">
                   <p className="text-[10px] font-black uppercase tracking-[0.28em] text-blue-200/80">Formulir Aduan</p>
                   <h3 className="mt-2 text-2xl font-black tracking-tight">Sampaikan masalah yang ingin diperbaiki</h3>
                   <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300">
@@ -184,7 +166,7 @@ export default function Lapor() {
                         required
                         type="text"
                         placeholder="Contoh: Lampu jalan mati di Gang 3"
-                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-red-100"
                         value={formData.judul}
                         onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
                       />
@@ -197,7 +179,7 @@ export default function Lapor() {
                           id="lapor-lokasi"
                           type="text"
                           placeholder="RT 01 / RW 10"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-11 pr-5 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-11 pr-5 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-red-100"
                           value={formData.lokasi}
                           onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
                         />
@@ -221,7 +203,7 @@ export default function Lapor() {
                           onClick={() => setFormData({ ...formData, kategori: option })}
                           className={`rounded-2xl border px-4 py-3 text-sm font-bold transition-all ${
                             formData.kategori === option
-                              ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
+                              ? "border-blue-200 bg-red-50 text-red-700 shadow-sm"
                               : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white"
                           }`}
                         >
@@ -239,13 +221,13 @@ export default function Lapor() {
                       rows={5}
                       required
                       placeholder="Jelaskan secara detail kendala yang dialami, kapan terjadi, dan dampaknya bagi warga."
-                      className="w-full resize-none rounded-[2rem] border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                      className="w-full resize-none rounded-[2rem] border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-red-100"
                       value={formData.deskripsi}
                       onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
                     />
                   </div>
 
-                  <div className="rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 px-6 py-7 transition-all hover:border-blue-300 hover:bg-blue-50/40">
+                  <div className="rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 px-6 py-7 transition-all hover:border-blue-300 hover:bg-red-50/40">
                     <div className="flex flex-col items-center text-center">
                       <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm">
                         <ImageIcon size={22} />
@@ -268,7 +250,7 @@ export default function Lapor() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-sm font-black text-white shadow-[0_18px_40px_-20px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-0.5 hover:bg-blue-600"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-sm font-black text-white shadow-[0_18px_40px_-20px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-0.5 hover:bg-red-600"
                     >
                       <Send size={16} />
                       {isSubmitting ? "Mengirim..." : "Kirim Laporan"}
@@ -303,20 +285,20 @@ export default function Lapor() {
                   </div>
                 </div>
 
-                <div className="rounded-[2rem] border border-blue-100 bg-blue-50/60 p-5 text-sm leading-relaxed text-blue-800">
+                <div className="rounded-[2rem] border border-red-100 bg-red-50/60 p-5 text-sm leading-relaxed text-blue-800">
                   Jika ada data tambahan, Anda bisa mengirim laporan baru atau kembali ke dashboard untuk memantau tindak lanjut.
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button
                     onClick={() => navigate("/dashboard-warga")}
-                    className="inline-flex flex-1 items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-sm font-black text-white transition-colors hover:bg-blue-600"
+                    className="inline-flex flex-1 items-center justify-center rounded-2xl bg-slate-900 px-6 py-4 text-sm font-black text-white transition-colors hover:bg-red-600"
                   >
                     Kembali ke Dashboard
                   </button>
                   <button
                     onClick={() => setStep(1)}
-                    className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 text-sm font-black text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-600"
+                    className="inline-flex flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 text-sm font-black text-slate-600 transition-colors hover:border-blue-200 hover:text-red-600"
                   >
                     Buat Laporan Lain
                   </button>

@@ -23,6 +23,10 @@ public class DevTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
 
+    public DevTokenAuthenticationFilter(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

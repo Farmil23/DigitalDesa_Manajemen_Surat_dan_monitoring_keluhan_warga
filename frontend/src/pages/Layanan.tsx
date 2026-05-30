@@ -16,9 +16,10 @@ import {
   Users,
   MapPin,
   ArrowLeft,
-  X,
   Loader2,
+  X
 } from "lucide-react";
+import WargaTopNav from "../components/WargaTopNav";
 
 // ─── CONFIGURATION ANIMASI ───────────────────────────────────────────────────
 
@@ -44,7 +45,8 @@ const DAFTAR_LAYANAN = [
     category: "Surat Keterangan",
     time: "Instan",
     icon: MapPin,
-    color: "blue"
+    color: "blue",
+    type: "SURAT"
   },
   { 
     title: "Surat Keterangan Usaha (SKU)", 
@@ -52,15 +54,17 @@ const DAFTAR_LAYANAN = [
     category: "Surat Keterangan",
     time: "1 Hari Kerja",
     icon: CreditCard,
-    color: "indigo"
+    color: "indigo",
+    type: "SURAT"
   },
   { 
-    title: "Update Data Kartu Keluarga", 
-    desc: "Sinkronisasi data jumlah anggota keluarga atau perubahan status kependudukan.",
-    category: "Kependudukan",
-    time: "Sistem Terpusat",
-    icon: Users,
-    color: "violet"
+    title: "Surat Keterangan Tidak Mampu (SKTM)", 
+    desc: "Pengantar untuk pengajuan beasiswa, bantuan sosial, atau keringanan biaya kesehatan.",
+    category: "Surat Keterangan",
+    time: "1 Hari Kerja",
+    icon: FileText,
+    color: "red",
+    type: "SURAT"
   },
   { 
     title: "Lapor Infrastruktur Rusak", 
@@ -68,15 +72,17 @@ const DAFTAR_LAYANAN = [
     category: "Laporan & Aspirasi",
     time: "24/7",
     icon: Flag,
-    color: "red"
+    color: "amber",
+    type: "LAPORAN"
   },
   { 
-    title: "Surat Pengantar Nikah", 
-    desc: "Dokumen awal sebagai syarat administrasi di tingkat KUA atau pencatatan sipil.",
-    category: "Surat Keterangan",
-    time: "2 Hari Kerja",
-    icon: FileText,
-    color: "blue"
+    title: "Update Data Kartu Keluarga", 
+    desc: "Sinkronisasi data jumlah anggota keluarga atau perubahan status kependudukan.",
+    category: "Kependudukan",
+    time: "Sistem Terpusat",
+    icon: Users,
+    color: "violet",
+    type: "INFO"
   },
   { 
     title: "Pendaftaran Warga Baru", 
@@ -84,7 +90,8 @@ const DAFTAR_LAYANAN = [
     category: "Kependudukan",
     time: "Validasi Digital",
     icon: UserCheck,
-    color: "violet"
+    color: "blue",
+    type: "INFO"
   }
 ];
 
@@ -109,6 +116,15 @@ export default function Layanan() {
 
   // 1. Fungsi Trigger saat tombol "Gunakan Layanan" diklik
   const handleOpenForm = (service: any) => {
+    if (service.type === "LAPORAN") {
+      navigate("/lapor");
+      return;
+    }
+    if (service.type === "INFO") {
+      toast.info("Layanan ini sedang dalam tahap pengembangan integrasi dengan Disdukcapil.");
+      return;
+    }
+    
     setSelectedLayanan(service);
     setKeperluan(""); // Clear input field sebelumnya
     setIsModalOpen(true);
@@ -145,30 +161,20 @@ export default function Layanan() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F9FC] font-sans antialiased pb-20 text-slate-900">
-      
+    <div className="min-h-screen bg-slate-50 font-sans antialiased pb-20 text-slate-900 selection:bg-red-200">
+      <WargaTopNav />
       {/* ── HEADER LAYANAN ── */}
       <section className="bg-slate-900 pt-16 pb-20 px-8 relative overflow-hidden">
-        <div className="max-w-6xl mx-auto mb-12 relative z-20">
-          <motion.button 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={() => navigate('/dashboard-warga')}
-            className="flex items-center gap-3 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white transition-all group"
-          >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" strokeWidth={3} />
-            <span className="text-xs font-black uppercase tracking-widest">Kembali ke Dashboard</span>
-          </motion.button>
-        </div>
+        <div className="max-w-6xl mx-auto mb-12 relative z-20" />
 
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600 rounded-full blur-[100px] opacity-20 -mr-20 -mt-20" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600 rounded-full blur-[100px] opacity-20 -mr-20 -mt-20" />
         <div className="absolute -left-20 bottom-0 w-72 h-72 bg-cyan-500 rounded-full blur-[120px] opacity-10" />
         
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.div initial="hidden" animate="visible" variants={FADE_UP} custom={0}>
-            <span className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Katalog Layanan Digital</span>
+            <span className="px-4 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Katalog Layanan Digital</span>
             <h1 className="text-4xl md:text-5xl font-black text-white mt-6 tracking-tighter leading-none">
-              Solusi Administrasi <br/> <span className="text-blue-500 font-serif italic">Satu Pintu.</span>
+              Solusi Administrasi <br/> <span className="text-red-500 font-serif italic">Satu Pintu.</span>
             </h1>
           </motion.div>
 
@@ -180,7 +186,7 @@ export default function Layanan() {
               placeholder="Cari layanan (misal: Domisili, Usaha...)" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 border border-white/10 rounded-[2rem] py-5 pl-14 pr-6 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur-xl transition-all"
+              className="w-full bg-white/10 border border-white/10 rounded-[2rem] py-5 pl-14 pr-6 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 backdrop-blur-xl transition-all"
             />
           </motion.div>
         </div>
@@ -195,7 +201,7 @@ export default function Layanan() {
               onClick={() => setFilter(cat)}
               className={`px-6 py-3 rounded-full text-xs font-black transition-all duration-300 ${
                 filter === cat 
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30" 
+                ? "bg-red-600 text-white shadow-lg shadow-red-500/30" 
                 : "text-slate-400 hover:text-slate-900 hover:bg-slate-50"
               }`}
             >
@@ -211,8 +217,8 @@ export default function Layanan() {
           {filteredServices.map((service, i) => {
             const IconComponent = service.icon;
             const colorMap: any = {
-              blue: "from-blue-500/10 to-blue-500/5 text-blue-600 bg-blue-50",
-              indigo: "from-indigo-500/10 to-indigo-500/5 text-indigo-600 bg-indigo-50",
+              blue: "from-red-500/10 to-red-500/5 text-red-600 bg-red-50",
+              indigo: "from-rose-500/10 to-rose-500/5 text-rose-600 bg-rose-50",
               violet: "from-violet-500/10 to-violet-500/5 text-violet-600 bg-violet-50",
               red: "from-red-500/10 to-red-500/5 text-red-600 bg-red-50"
             };
@@ -230,11 +236,11 @@ export default function Layanan() {
                 className="group bg-white p-8 rounded-[3rem] border border-slate-100 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.04)] hover:border-blue-200 text-left transition-all flex flex-col justify-between w-full min-h-[320px]"
               >
                 <div>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-blue-600 transition-all duration-500 shadow-sm ${colorMap[service.color] || colorMap.blue}`}>
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-red-600 transition-all duration-500 shadow-sm ${colorMap[service.color] || colorMap.blue}`}>
                     <IconComponent className="group-hover:text-white transition-colors" size={24} strokeWidth={2.5} />
                   </div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-md leading-none">{service.category}</span>
+                    <span className="text-[9px] font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-md leading-none">{service.category}</span>
                     <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400">
                       <Clock size={10} /> {service.time}
                     </div>
@@ -247,7 +253,7 @@ export default function Layanan() {
 
                 <div className="mt-10 pt-6 border-t border-slate-50 flex items-center justify-between w-full">
                   {/* FIX TYPO: gap-2ADA sudah dibersihkan menjadi gap-2 */}
-                  <span className="text-xs font-black text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-2">
+                  <span className="text-xs font-black text-slate-900 group-hover:text-red-600 transition-colors flex items-center gap-2">
                     Gunakan Layanan <ArrowRight size={14} strokeWidth={3} />
                   </span>
                   <Info size={16} className="text-slate-200 group-hover:text-blue-200 transition-colors" />
@@ -271,8 +277,8 @@ export default function Layanan() {
 
       {/* ── FOOTER INFO ── */}
       <section className="max-w-4xl mx-auto px-8 mt-24">
-        <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 p-10 rounded-[3rem] border border-blue-100/50 flex flex-col md:flex-row items-center gap-8 shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30 shrink-0">
+        <div className="bg-gradient-to-br from-slate-50 to-red-50/30 p-10 rounded-[3rem] border border-red-100/50 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-600/30 shrink-0">
             <Zap className="text-white" size={28} strokeWidth={2.5} />
           </div>
           <div className="flex-1">
@@ -281,7 +287,7 @@ export default function Layanan() {
               Sistem kami terhubung langsung dengan database kependudukan desa. Pastikan data profil Anda sudah terverifikasi untuk menggunakan layanan instan.
             </p>
           </div>
-          <button onClick={() => navigate('/dashboard-warga')} className="whitespace-nowrap px-6 py-3 bg-white border border-slate-200 rounded-xl text-xs font-black hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm">
+          <button onClick={() => navigate('/dashboard-warga')} className="whitespace-nowrap px-6 py-3 bg-white border border-slate-200 rounded-xl text-xs font-black hover:border-red-500 hover:text-red-600 transition-all shadow-sm">
             Cek Status Surat Saya
           </button>
         </div>
@@ -308,7 +314,7 @@ export default function Layanan() {
 
               <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                 <div className="relative overflow-hidden bg-slate-900 px-8 py-10 text-white sm:px-10">
-                  <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-blue-500/25 blur-3xl" />
+                  <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-red-500/25 blur-3xl" />
                   <div className="absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl" />
                   <p className="relative text-[10px] font-black uppercase tracking-[0.28em] text-blue-200/80">Permohonan Dokumen Resmi</p>
                   <h3 className="relative mt-4 text-3xl font-black tracking-tight">{selectedLayanan.title}</h3>
@@ -351,13 +357,13 @@ export default function Layanan() {
                         value={keperluan}
                         onChange={(e) => setKeperluan(e.target.value)}
                         placeholder="Contoh: Digunakan sebagai syarat administrasi kelengkapan berkas lamaran kerja di PT. Surya Kencana Bandung."
-                        className="h-32 w-full resize-none rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                        className="h-32 w-full resize-none rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-red-100"
                       />
                     </div>
 
-                    <div className="rounded-[1.75rem] border border-blue-100 bg-blue-50/70 p-4 text-xs leading-relaxed text-blue-800">
+                    <div className="rounded-[1.75rem] border border-red-100 bg-red-50/70 p-4 text-xs leading-relaxed text-blue-800">
                       <div className="flex items-start gap-2.5">
-                        <Info size={15} className="mt-0.5 shrink-0 text-blue-600" />
+                        <Info size={15} className="mt-0.5 shrink-0 text-red-600" />
                         <p>Data pemohon diambil langsung dari profil kependudukan. Jika ada ketidaksesuaian, perbarui data sebelum mengirim pengajuan.</p>
                       </div>
                     </div>
@@ -365,7 +371,7 @@ export default function Layanan() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white transition-all hover:-translate-y-0.5 hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-4 text-[11px] font-black uppercase tracking-[0.24em] text-white transition-all hover:-translate-y-0.5 hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Kirim Permohonan Surat <ArrowRight size={14} /></>}
                     </button>

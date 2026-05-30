@@ -26,6 +26,7 @@ import {
   User,
   CheckCircle2,
 } from "lucide-react";
+import AdminLayout from "../components/AdminLayout";
 
 export default function AdminKeuangan() {
   const navigate = useNavigate();
@@ -192,102 +193,32 @@ export default function AdminKeuangan() {
       return matchType && matchDate;
     }) || [];
 
-  const menuItems = [
-    { n: "Overview", i: LayoutDashboard, p: "/admin" },
-    { n: "Validasi Surat", i: Files, p: "/admin/validasi" },
-    { n: "Moderasi Lapor", i: AlertTriangle, p: "/admin/laporan" },
-    { n: "Data Penduduk", i: Users, p: "/admin/penduduk" },
-    { n: "Keuangan Desa", i: BarChart3, p: "/admin/keuangan", active: true },
-    { n: "Pengaturan", i: Settings, p: "/admin/pengaturan" },
-  ];
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-          <p className="text-sm font-semibold text-slate-500">
-            Sinkronisasi data kas desa...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased flex">
-      <aside className="hidden lg:flex w-72 bg-white border-r border-slate-200 flex-col sticky top-0 h-screen z-50">
-        <div
-          className="px-7 py-7 flex items-center gap-3 cursor-pointer border-b border-slate-100"
-          onClick={() => navigate("/admin")}
-        >
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="font-bold text-slate-900 tracking-tight leading-none">DigiDesa</p>
-            <p className="text-xs text-slate-500 mt-1">Panel Admin Desa</p>
-          </div>
-        </div>
-
-        <nav className="flex-1 px-5 py-6 space-y-1.5">
-          <p className="px-3 mb-3 text-xs font-semibold text-slate-400">Navigasi</p>
-          {menuItems.map((item) => {
-            const Icon = item.i;
-            return (
-              <button
-                key={item.n}
-                onClick={() => navigate(item.p)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                  item.active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <Icon size={18} strokeWidth={item.active ? 2.6 : 2.2} />
-                {item.n}
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-
-      <main className="flex-1 flex flex-col min-h-screen min-w-0">
-        <header className="h-20 bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-40 px-6 lg:px-10 flex items-center justify-between">
-          <div className="flex items-center gap-4 min-w-0">
-            <button
-              onClick={() => navigate("/admin")}
-              className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors shrink-0"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-slate-950 tracking-tight truncate">Transparansi Keuangan</h1>
-              <p className="text-sm text-slate-500 mt-1 truncate">Pantau pemasukan, pengeluaran, bukti nota, dan saldo kas desa.</p>
-            </div>
-          </div>
+    <AdminLayout activeMenu="Keuangan Desa" title="Transparansi Keuangan" subtitle="Pantau pemasukan, pengeluaran, bukti nota, dan saldo kas desa">
+      <div className="space-y-8 max-w-7xl mx-auto w-full">
+        <div className="flex justify-end">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all shadow-sm"
           >
             <Plus size={17} strokeWidth={2.5} />
             Tambah transaksi
           </button>
-        </header>
-
-        <div className="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto w-full">
+        </div>
           {/* CARD STATS GRID (SINKRON DENGAN DATA SPRING BOOT) */}
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             <button
               type="button"
               onClick={() => setTypeFilter("ALL")}
               className={`text-left p-6 rounded-2xl border transition-all ${
-                typeFilter === "ALL" ? "bg-blue-600 text-white border-blue-600 shadow-sm" : "bg-white border-slate-200 hover:border-blue-200"
+                typeFilter === "ALL" ? "bg-red-600 text-white border-red-600 shadow-sm" : "bg-white border-slate-200 hover:border-blue-200"
               }`}
             >
-              <p className={`text-sm font-semibold ${typeFilter === "ALL" ? "text-blue-100" : "text-slate-500"}`}>Saldo kas desa</p>
+              <p className={`text-sm font-semibold ${typeFilter === "ALL" ? "text-red-100" : "text-slate-500"}`}>Saldo kas desa</p>
               <h3 className="text-2xl font-bold mt-2 tracking-tight truncate">
                 {formatIDR(financeData?.summary?.balance || financeData?.balance)}
               </h3>
-              <p className={`text-xs font-medium mt-4 flex items-center gap-1.5 ${typeFilter === "ALL" ? "text-blue-100" : "text-blue-600"}`}>
+              <p className={`text-xs font-medium mt-4 flex items-center gap-1.5 ${typeFilter === "ALL" ? "text-red-100" : "text-red-600"}`}>
                 <CheckCircle2 size={14} className="shrink-0" />
                 <span className="truncate">{typeFilter === "ALL" ? "Semua transaksi tampil" : "Klik untuk reset filter"}</span>
               </p>
@@ -338,7 +269,7 @@ export default function AdminKeuangan() {
             <div className="p-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between">
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-semibold text-slate-500">Dana siaga</p>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
                   <Wallet size={19} />
                 </div>
               </div>
@@ -364,7 +295,7 @@ export default function AdminKeuangan() {
                     type="date"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl py-2.5 pl-10 pr-9 text-slate-700 focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                    className="bg-slate-50 border border-slate-200 text-sm font-medium rounded-xl py-2.5 pl-10 pr-9 text-slate-700 focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all"
                   />
                   <Calendar size={15} className="absolute left-3.5 text-slate-400 pointer-events-none" />
                   {dateFilter && (
@@ -405,7 +336,7 @@ export default function AdminKeuangan() {
                                 </p>
                               </td>
                               <td className="px-5 py-5 text-center">
-                                <span className="inline-flex max-w-full px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold truncate">
+                                <span className="inline-flex max-w-full px-2.5 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-semibold truncate">
                                   {t.category || "General"}
                                 </span>
                               </td>
@@ -414,7 +345,7 @@ export default function AdminKeuangan() {
                               </td>
                               <td className="px-5 py-5 text-center">
                                 <div className="flex items-center justify-center gap-1.5">
-                                  <button onClick={() => openDetail(t)} className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center">
+                                  <button onClick={() => openDetail(t)} className="w-8 h-8 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all flex items-center justify-center">
                                     <Eye size={14} />
                                   </button>
                                   <button onClick={() => openEditModal(t)} className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-600 hover:text-white transition-all flex items-center justify-center">
@@ -446,14 +377,14 @@ export default function AdminKeuangan() {
             <div className="space-y-6 min-w-0">
               <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
                 <h3 className="font-bold text-slate-950 mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
                     <PieChart size={19} />
                   </div>
                   Statistik Belanja
                 </h3>
                 <div className="space-y-5">
                   {[
-                    { label: "Infrastruktur", val: 45, color: "bg-blue-500" },
+                    { label: "Infrastruktur", val: 45, color: "bg-red-500" },
                     { label: "Bantuan Sosial", val: 30, color: "bg-emerald-500" },
                     { label: "Operasional", val: 25, color: "bg-amber-500" },
                   ].map((item) => (
@@ -471,11 +402,11 @@ export default function AdminKeuangan() {
               </div>
 
               <div className="bg-slate-900 rounded-2xl p-6 text-white relative overflow-hidden">
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl" />
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-red-600/20 rounded-full blur-3xl" />
                 <h4 className="text-sm font-semibold mb-2 text-slate-400">Target penyerapan</h4>
                 <p className="text-4xl font-bold tracking-tight leading-none">94.2%</p>
                 <div className="mt-6 h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 w-[94.2%] rounded-full" />
+                  <div className="h-full bg-red-500 w-[94.2%] rounded-full" />
                 </div>
                 <p className="text-xs font-medium mt-4 text-slate-400">Monitoring kas DigiDesa v1.0</p>
               </div>
@@ -490,7 +421,7 @@ export default function AdminKeuangan() {
               <motion.div initial={{ scale: 0.96, y: 16 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, y: 16 }} className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
                 <div className="flex-1 p-8 lg:p-10 border-r border-slate-100">
                   <div className="flex justify-between items-start mb-8">
-                    <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center text-white">
+                    <div className="w-11 h-11 rounded-xl bg-red-600 flex items-center justify-center text-white">
                       <Files size={21} />
                     </div>
                     <button onClick={() => setIsDetailOpen(false)} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-full text-slate-500">
@@ -514,7 +445,7 @@ export default function AdminKeuangan() {
                     </div>
                     <div className="flex justify-between gap-5 py-3 border-b border-dashed border-slate-200">
                       <span className="font-medium text-slate-500">Penerima dana</span>
-                      <span className="font-semibold text-blue-600 text-right">{selectedTrx.recipient || "Bendahara Desa"}</span>
+                      <span className="font-semibold text-red-600 text-right">{selectedTrx.recipient || "Bendahara Desa"}</span>
                     </div>
                     <div className="flex justify-between gap-5 py-3 border-b border-dashed border-slate-200">
                       <span className="font-medium text-slate-500">Nominal</span>
@@ -541,7 +472,7 @@ export default function AdminKeuangan() {
                       </div>
                     )}
                   </div>
-                  <button className="w-full py-3.5 bg-slate-900 text-white rounded-xl text-sm font-semibold mt-6 hover:bg-blue-600 transition-all">Download Bukti PDF</button>
+                  <button className="w-full py-3.5 bg-slate-900 text-white rounded-xl text-sm font-semibold mt-6 hover:bg-red-600 transition-all">Download Bukti PDF</button>
                 </div>
               </motion.div>
             </motion.div>
@@ -579,36 +510,36 @@ export default function AdminKeuangan() {
 
                   <div>
                     <label className="text-sm font-semibold text-slate-600 mb-1.5 block">Judul Transaksi</label>
-                    <input required type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" placeholder="Contoh: Dana Desa Tahap 1" />
+                    <input required type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all" placeholder="Contoh: Dana Desa Tahap 1" />
                   </div>
 
                   <div>
                     <label className="text-sm font-semibold text-slate-600 mb-1.5 block">Penerima Dana / Vendor</label>
-                    <input required type="text" value={formData.recipient} onChange={(e) => setFormData({ ...formData, recipient: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" placeholder="Contoh: Toko Bangunan Jaya" />
+                    <input required type="text" value={formData.recipient} onChange={(e) => setFormData({ ...formData, recipient: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all" placeholder="Contoh: Toko Bangunan Jaya" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="text-sm font-semibold text-slate-600 mb-1.5 block">Nominal (Rp)</label>
-                      <input required type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" placeholder="0" />
+                      <input required type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all" placeholder="0" />
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-slate-600 mb-1.5 block">Kategori</label>
-                      <input required type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" placeholder="Contoh: Infrastruktur" />
+                      <input required type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all" placeholder="Contoh: Infrastruktur" />
                     </div>
                   </div>
 
                   <div>
                     <label className="text-sm font-semibold text-slate-600 mb-1.5 block">Tanggal Transaksi</label>
-                    <input required type="date" value={formData.transaction_date} onChange={(e) => setFormData({ ...formData, transaction_date: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" />
+                    <input required type="date" value={formData.transaction_date} onChange={(e) => setFormData({ ...formData, transaction_date: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-sm font-medium focus:border-blue-300 focus:ring-4 focus:ring-red-500/10 outline-none transition-all" />
                   </div>
 
                   <div>
                     <label className="text-sm font-semibold text-slate-600 mb-1.5 block">Upload Kuitansi</label>
-                    <input type="file" accept="image/*" onChange={(e: any) => setFormData({ ...formData, evidence: e.target.files[0] })} className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                    <input type="file" accept="image/*" onChange={(e: any) => setFormData({ ...formData, evidence: e.target.files[0] })} className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100" />
                   </div>
 
-                  <button type="submit" disabled={isSubmitting} className={`w-full py-3.5 mt-6 text-white rounded-xl text-sm font-semibold shadow-sm transition-all flex justify-center items-center ${ isEditMode ? "bg-amber-500 hover:bg-amber-600" : "bg-blue-600 hover:bg-blue-700" }`}>
+                  <button type="submit" disabled={isSubmitting} className={`w-full py-3.5 mt-6 text-white rounded-xl text-sm font-semibold shadow-sm transition-all flex justify-center items-center ${ isEditMode ? "bg-amber-500 hover:bg-amber-600" : "bg-red-600 hover:bg-red-700" }`}>
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : isEditMode ? "Simpan Perubahan" : "Catat Transaksi"}
                   </button>
                 </form>
@@ -616,7 +547,6 @@ export default function AdminKeuangan() {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
-    </div>
+    </AdminLayout>
   );
 }

@@ -91,6 +91,14 @@ public class User {
     @JoinColumn(name = "no_kk", referencedColumnName = "no_kk", insertable = false, updatable = false)
     private Keluarga keluarga;
 
+    public Long getId() {
+        return this.id;
+    }
+
+    public Role getRole() {
+        return this.role;
+    }
+
     // ─── GATEWAY SINKRONISASI REACT FRONTEND (TIDAK MERUBAH DATABASE) ───
 
     /**

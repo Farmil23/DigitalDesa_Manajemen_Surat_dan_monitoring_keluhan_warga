@@ -53,3 +53,4 @@ uploads/*
 uploads/ktp/*
 !uploads/ktp/
 !uploads/ktp/.gitkeep
+lombok.jar
