@@ -27,6 +27,6 @@ EXPOSE 7860
 # Add uploads directory
 RUN mkdir -p /app/uploads/pengaduan
 
-COPY --from=backend-builder /app/backend/target/*.jar app.jar
+COPY --from=backend-builder /app/backend/target/demo-0.0.1-SNAPSHOT.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
