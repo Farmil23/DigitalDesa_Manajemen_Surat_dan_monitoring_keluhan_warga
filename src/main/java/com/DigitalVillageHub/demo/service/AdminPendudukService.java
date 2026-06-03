@@ -31,6 +31,14 @@ public class AdminPendudukService {
     }
 
     public User createPenduduk(User request) {
+        if (request.getNik() == null || request.getNik().isBlank()) {
+            throw new RuntimeException("NIK wajib diisi");
+        }
+
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            request.setUsername(request.getNik()); // Default username ke NIK jika kosong
+        }
+
         if (userRepository.existsByNik(request.getNik())) {
             throw new RuntimeException("NIK sudah digunakan");
         }
@@ -62,7 +70,12 @@ public class AdminPendudukService {
         user.setNik(request.getNik());
         user.setNoKk(request.getNoKk());
         user.setNamaLengkap(request.getNamaLengkap());
-        user.setUsername(request.getUsername());
+        
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            user.setUsername(request.getNik() != null ? request.getNik() : user.getNik());
+        } else {
+            user.setUsername(request.getUsername());
+        }
         user.setNoHp(request.getNoHp());
         user.setAlamat(request.getAlamat());
         user.setRt(request.getRt());
