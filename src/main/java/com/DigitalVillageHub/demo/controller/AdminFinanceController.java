@@ -71,7 +71,7 @@ public class AdminFinanceController {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         response.put("message", "Transaksi berhasil ditambahkan");
-        response.put("data", adminFinanceService.createTransaction(finance));
+        response.put("data", adminFinanceService.createTransaction(finance, evidence));
         return ResponseEntity.status(201).body(response);
     }
 
@@ -111,7 +111,7 @@ public class AdminFinanceController {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         response.put("message", "Transaksi berhasil diperbarui");
-        response.put("data", adminFinanceService.updateTransaction(id, finance));
+        response.put("data", adminFinanceService.updateTransaction(id, finance, evidence));
         return ResponseEntity.ok(response);
     }
 

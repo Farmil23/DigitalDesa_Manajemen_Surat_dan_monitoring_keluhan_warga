@@ -11,6 +11,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +55,7 @@ public class AdminFinanceService {
     }
 
     @Transactional
-    public Finance createTransaction(Finance finance) {
+    public Finance createTransaction(Finance finance, MultipartFile evidence) {
         String normalizedType = normalizeType(finance.getType());
         if (normalizedType == null) {
             throw new RuntimeException("Tipe transaksi wajib diisi");
@@ -86,11 +92,15 @@ public class AdminFinanceService {
             finance.setCurrentBalance(lastBalance); // Jika tipe tidak dikenal, saldo tetap
         }
 
+        if (evidence != null && !evidence.isEmpty()) {
+            finance.setEvidenceUrl(storeFinanceEvidence(evidence));
+        }
+
         return financeRepository.save(finance);
     }
 
     @Transactional
-    public Finance updateTransaction(Long id, Finance request) {
+    public Finance updateTransaction(Long id, Finance request, MultipartFile evidence) {
         Finance finance = financeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Data keuangan tidak ditemukan"));
 
@@ -116,7 +126,9 @@ public class AdminFinanceService {
         if (request.getRecipient() != null) {
             finance.setRecipient(request.getRecipient());
         }
-        if (request.getEvidenceUrl() != null) {
+        if (evidence != null && !evidence.isEmpty()) {
+            finance.setEvidenceUrl(storeFinanceEvidence(evidence));
+        } else if (request.getEvidenceUrl() != null) {
             finance.setEvidenceUrl(request.getEvidenceUrl());
         }
         if (request.getCurrentBalance() != null) {
@@ -152,5 +164,46 @@ public class AdminFinanceService {
             case "EXPENSE", "PENGELUARAN" -> "EXPENSE";
             default -> upper;
         };
+    }
+
+    private String storeFinanceEvidence(MultipartFile evidence) {
+        String contentType = evidence.getContentType();
+        if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png") || contentType.equals("application/pdf"))) {
+            throw new RuntimeException("Tipe file tidak didukung. Harap unggah JPEG, PNG, atau PDF.");
+        }
+
+        String originalName = evidence.getOriginalFilename();
+        if (originalName == null || originalName.isBlank()) {
+            throw new RuntimeException("Nama file tidak valid");
+        }
+
+        String lowerCaseName = originalName.toLowerCase();
+        if (!lowerCaseName.endsWith(".jpg") && !lowerCaseName.endsWith(".jpeg") && !lowerCaseName.endsWith(".png") && !lowerCaseName.endsWith(".pdf")) {
+            throw new RuntimeException("Ekstensi file tidak diizinkan. Harap unggah .jpg, .jpeg, .png, atau .pdf.");
+        }
+
+        String extension = "";
+        int dotIndex = originalName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            extension = originalName.substring(dotIndex);
+        } else {
+            throw new RuntimeException("Ekstensi file tidak ditemukan");
+        }
+
+        try {
+            Path uploadDir = Paths.get("uploads", "finance");
+            Files.createDirectories(uploadDir);
+
+            String fileName = "finance_" + java.util.UUID.randomUUID().toString() + extension;
+            Path target = uploadDir.resolve(fileName);
+
+            try (var in = evidence.getInputStream()) {
+                Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return "/uploads/finance/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("Gagal menyimpan berkas kuitansi");
+        }
     }
 }

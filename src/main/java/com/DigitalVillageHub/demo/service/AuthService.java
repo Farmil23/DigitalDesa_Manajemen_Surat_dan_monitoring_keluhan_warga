@@ -110,7 +110,11 @@ public class AuthService {
                         "nama_lengkap", user.getNamaLengkap(),
                         "username", user.getUsername(),
                         "role", user.getRole().name(),
-                        "status_akun", user.getStatusAkun()
+                        "status_akun", user.getStatusAkun(),
+                        "status_tinggal", user.getStatusTinggal() != null ? user.getStatusTinggal().name() : "TETAP",
+                        "rt", user.getRt() != null ? user.getRt() : "",
+                        "rw", user.getRw() != null ? user.getRw() : "",
+                        "alamat", user.getAlamat() != null ? user.getAlamat() : ""
                 ))
                 .build();
     }

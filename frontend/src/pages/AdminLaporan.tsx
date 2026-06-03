@@ -41,6 +41,7 @@ type ComplaintItem = {
   lokasi: string;
   prioritas: string;
   status: string;
+  foto_bukti?: string;
   fotoBukti?: string;
   alasanDitolak?: string;
   tanggalDiproses?: string;
@@ -131,6 +132,11 @@ const getFinalStepDate = (complaint: ComplaintItem) => {
   if (norm === "SELESAI") return safeFormatTanggal(complaint.tanggalSelesai);
   if (norm === "DITOLAK") return "Administrasi gagal";
   return "-";
+};
+
+const getImageUrl = (url?: string) => {
+  if (!url) return "";
+  return import.meta.env.PROD ? url : `http://localhost:5000${url}`;
 };
 
 const AdminMetricCard = ({ title, value, helper, tone, icon }: { title: string; value: number; helper: string; tone: "blue" | "amber" | "emerald" | "red"; icon: React.ReactNode }) => {
@@ -545,11 +551,11 @@ export default function AdminLaporan() {
                       </div>
 
                       {/* Photo Lampiran */}
-                      {selectedComplaint.fotoBukti && (
+                      {(selectedComplaint.foto_bukti || selectedComplaint.fotoBukti) && (
                         <div className="mt-4">
                           <span className="font-black block text-[9px] uppercase tracking-widest text-slate-400 mb-2">Lampiran Bukti Foto Warga:</span>
-                          <a href={selectedComplaint.fotoBukti} target="_blank" rel="noreferrer" className="block max-w-sm rounded-xl overflow-hidden border border-slate-200 group">
-                            <img src={selectedComplaint.fotoBukti} className="w-full h-32 object-cover group-hover:scale-105 transition-all" alt="Foto aduan" />
+                          <a href={getImageUrl(selectedComplaint.foto_bukti || selectedComplaint.fotoBukti)} target="_blank" rel="noreferrer" className="block max-w-sm rounded-xl overflow-hidden border border-slate-200 group">
+                            <img src={getImageUrl(selectedComplaint.foto_bukti || selectedComplaint.fotoBukti)} className="w-full h-32 object-cover group-hover:scale-105 transition-all" alt="Foto aduan" />
                           </a>
                         </div>
                       )}
