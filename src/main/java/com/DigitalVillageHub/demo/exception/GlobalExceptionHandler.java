@@ -40,7 +40,34 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<?> handleNoResourceFound(org.springframework.web.servlet.resource.NoResourceFoundException e, jakarta.servlet.http.HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        if (uri != null && uri.startsWith("/api/")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", "Endpoint API tidak ditemukan: " + uri
+            ));
+        }
 
+        try {
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.ClassPathResource("static/index.html");
+            if (!resource.exists()) {
+                resource = new org.springframework.core.io.ClassPathResource("public/index.html");
+            }
+            if (resource.exists()) {
+                String html = org.springframework.util.StreamUtils.copyToString(resource.getInputStream(), java.nio.charset.StandardCharsets.UTF_8);
+                return ResponseEntity.ok().contentType(org.springframework.http.MediaType.TEXT_HTML).body(html);
+            }
+        } catch (java.io.IOException ex) {
+            // Ignore
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "success", false,
+                "message", "Route tidak ditemukan: " + uri
+        ));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
