@@ -2,10 +2,13 @@ package com.DigitalVillageHub.demo.service;
 
 import com.DigitalVillageHub.demo.dto.VerifikasiWargaDTO;
 import com.DigitalVillageHub.demo.model.entity.User;
+import com.DigitalVillageHub.demo.model.entity.Keluarga;
 import com.DigitalVillageHub.demo.persistence.UserRepository;
+import com.DigitalVillageHub.demo.persistence.KeluargaRepository;
 import com.DigitalVillageHub.demo.model.enums.StatusAkun;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class AdminPendudukService {
 
     private final UserRepository userRepository;
+    private final KeluargaRepository keluargaRepository;
 
     public List<User> getAllPenduduk() {
         return userRepository.findAll();
@@ -61,6 +65,10 @@ public class AdminPendudukService {
             request.setStatusAkun(StatusAkun.APPROVED);
         }
 
+        if (request.getNoKk() != null && !request.getNoKk().isBlank()) {
+            ensureKeluargaExists(request.getNoKk());
+        }
+
         return userRepository.save(request);
     }
 
@@ -89,6 +97,10 @@ public class AdminPendudukService {
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+        }
+
+        if (request.getNoKk() != null && !request.getNoKk().isBlank()) {
+            ensureKeluargaExists(request.getNoKk());
         }
 
         return userRepository.save(user);
@@ -145,5 +157,24 @@ public class AdminPendudukService {
 
     public void deletePenduduk(Long id) {
         userRepository.delete(getPendudukById(id));
+    }
+
+    private void ensureKeluargaExists(String noKk) {
+        if (noKk == null || noKk.isBlank()) {
+            return;
+        }
+        if (keluargaRepository.existsById(noKk)) {
+            return;
+        }
+        try {
+            keluargaRepository.save(Keluarga.builder()
+                    .noKk(noKk)
+                    .alamatKk(null)
+                    .build());
+        } catch (DataIntegrityViolationException e) {
+            if (!keluargaRepository.existsById(noKk)) {
+                throw new RuntimeException("Gagal mendaftarkan Kartu Keluarga otomatis.");
+            }
+        }
     }
 }
