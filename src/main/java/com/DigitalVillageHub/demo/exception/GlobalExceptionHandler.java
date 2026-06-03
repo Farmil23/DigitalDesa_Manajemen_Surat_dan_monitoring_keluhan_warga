@@ -42,7 +42,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException e) {
+    public Object handleNoResourceFound(NoResourceFoundException e, jakarta.servlet.http.HttpServletRequest request) {
+        if (!request.getRequestURI().startsWith("/api/")) {
+            return new org.springframework.web.servlet.ModelAndView("forward:/index.html");
+        }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                 "success", false,
                 "message", "Endpoint tidak ditemukan"
