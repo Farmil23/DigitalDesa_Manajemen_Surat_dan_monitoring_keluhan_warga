@@ -14,7 +14,10 @@ public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
     public Object handleError(HttpServletRequest request) {
-        String originalUri = (String) request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI);
+        String originalUri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+        if (originalUri == null) {
+            originalUri = (String) request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI);
+        }
         if (originalUri == null) {
             originalUri = request.getRequestURI();
         }
