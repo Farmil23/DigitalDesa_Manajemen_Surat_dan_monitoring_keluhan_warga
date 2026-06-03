@@ -41,13 +41,7 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                "success", false,
-                "message", "Endpoint tidak ditemukan"
-        ));
-    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
