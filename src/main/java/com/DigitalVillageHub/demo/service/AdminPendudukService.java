@@ -88,12 +88,20 @@ public class AdminPendudukService {
         user.setAlamat(request.getAlamat());
         user.setRt(request.getRt());
         user.setRw(request.getRw());
-        user.setRole(request.getRole());
-        user.setStatusAkun(request.getStatusAkun());
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
+        }
+        if (request.getStatusAkun() != null) {
+            user.setStatusAkun(request.getStatusAkun());
+        }
         user.setStatusHubungan(request.getStatusHubungan());
         user.setStatusTinggal(request.getStatusTinggal());
-        user.setFotoKtp(request.getFotoKtp());
-        user.setAlasanDitolak(request.getAlasanDitolak());
+        if (request.getFotoKtp() != null) {
+            user.setFotoKtp(request.getFotoKtp());
+        }
+        if (request.getAlasanDitolak() != null) {
+            user.setAlasanDitolak(request.getAlasanDitolak());
+        }
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
